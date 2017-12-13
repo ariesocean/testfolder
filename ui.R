@@ -78,10 +78,10 @@ ui <- dashboardPage(
                   side='right',
                   height=550,
                   #status = 'primary',
-                  tabPanel('L-V',
+                  tabPanel('M-V',
                            plotOutput("analystplot3", height = 490, width = '100%')
                   ),
-                  tabPanel('D-L',
+                  tabPanel('D-M',
                            plotOutput("analystplot2", height = 490, width = '100%')
                   ),
                   tabPanel('A-D',
@@ -96,9 +96,9 @@ ui <- dashboardPage(
                   title = "Summary",
                   side='right',
                   #status = 'primary',
-                  tabPanel('L-V',
+                  tabPanel('M-V',
                            DT::dataTableOutput('summarytable3')),
-                  tabPanel('D-L',
+                  tabPanel('D-M',
                            DT::dataTableOutput('summarytable2')),
                   tabPanel('A-D',
                            DT::dataTableOutput('summarytable1'))

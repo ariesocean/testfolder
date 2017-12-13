@@ -18,6 +18,7 @@ cumulative_return_table<-function(retrieved_data){
   df<-df[order(df$Constituent),]
   df[df$Constituent=='adidas',c('Constituent')]<-'Adidas'
   df[df$Constituent == 'Volkswagen (VW) vz',c('Constituent')]='Volkswagen'
+  df[df$Constituent=='thyssenkrupp',c('Constituent')]<-'Thyssenkrupp'
   df[df$Constituent == 'Münchener Rückversicherungs-Gesellschaft',c('Constituent')]='Münchener RG'
   df[,c('six_months_return','one_year_return','three_years_return')]<-round(df[,c('six_months_return','one_year_return','three_years_return')],2)
   datatable(df,rownames = FALSE,options = list(pageLength = 10),colnames = c('Constituent','6 months cml.return','1 year cml.return','3 years cml.return')) %>%
@@ -27,9 +28,10 @@ cumulative_return_table<-function(retrieved_data){
 
 #This function creates a datatable for EPS
 EPS_table<-function(retrieved_data){
-  df<-retrieved_data[,c('Constituent','Current_EPS','EPS_last_year')]
-  df<-df[complete.cases(df), ]
-  df[df$Constituent=='adidas',c('Constituent')]='Adidas'
+  df<-retrieved_data[complete.cases(retrieved_data), ]
+  #df[df$Constituent=='adidas',c('Constituent')]='Adidas'
+  df[df$Constituent=='thyssenkrupp',c('Constituent')]<-'Thyssenkrupp'
+  df[df$Constituent=='Volkswagen (VW) vz',c('Constituent')]<-'Volkswagen'
   df<-df[order(df$Constituent),]
   #df[df$Constituent == 'Volkswagen (VW) vz',c('Constituent')]='Volkswagen'
   df[df$Constituent == 'Münchener Rückversicherungs-Gesellschaft',c('Constituent')]='Münchener RG'
@@ -48,9 +50,10 @@ EPS_table<-function(retrieved_data){
 
 #Makes a horizontal bar datatable displaying PER
 PER_table<-function(retrieved_data){
-  df<-retrieved_data[,c('Constituent','Current_PER','PER_last_year')]
-  df<-df[complete.cases(df), ]
+  df<-retrieved_data[complete.cases(retrieved_data), ]
   df[df$Constituent=='adidas',c('Constituent')]<-'Adidas'
+  df[df$Constituent=='thyssenkrupp',c('Constituent')]<-'Thyssenkrupp'
+  df[df$Constituent=='Volkswagen (VW) vz',c('Constituent')]<-'Volkswagen'
   df<-df[order(df$Constituent),]
   #df[df$Constituent == 'Volkswagen (VW) vz',c('Constituent')]='Volkswagen'
   df[df$Constituent == 'Münchener Rückversicherungs-Gesellschaft',c('Constituent')]='Münchener RG'
@@ -66,9 +69,6 @@ PER_table<-function(retrieved_data){
       backgroundRepeat = 'no-repeat',
       backgroundPosition = 'center')
   
-  #%>%
-  #formatStyle(c('Recent cross'),
-  #color = styleInterval(c('Golden Cross','Death Cross'),c('red')))
 }
 
 
@@ -77,6 +77,8 @@ rank_n_tag<-function(retrieved_data){
   df<-retrieved_data[,c('Profitability_rank','Constituent','Price_growth','Fundamental_growth')]
   df$Profitability_rank<- df$Profitability_rank+1
   df<-df[order(df$Profitability_rank),]
+  df[df$Constituent=='adidas',c('Constituent')]<-'Adidas'
+  df[df$Constituent=='thyssenkrupp',c('Constituent')]<-'Thyssenkrupp'
   df[df$Constituent == 'Volkswagen (VW) vz',c('Constituent')]='Volkswagen'
   df[df$Constituent == 'Münchener Rückversicherungs-Gesellschaft',c('Constituent')]='Münchener RG'
   datatable(df,rownames = FALSE,options = list(pageLength = 10),colnames = c('Rank','Constituent','Growth in stock price','Growth in fundamental')) %>%formatStyle('Profitability_rank', textAlign = 'center')

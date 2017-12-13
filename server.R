@@ -2,7 +2,7 @@ library(wordcloud)
 library(RColorBrewer)
 library(plotly)
 library(treemap)
-
+library(jsonlite)
 
 options(scipen=1000)
 library(DT)
@@ -48,8 +48,6 @@ server <- function(input, output){
   })
   
   
-  ## News Section
-  ## News Table - Interactive DataTable
   from_date <- as.integer(as.POSIXct(strptime("2017-11-10","%Y-%m-%d"))) * 1000
   to_date <- as.integer(as.POSIXct(strptime("2017-11-16","%Y-%m-%d"))) * 1000
   
@@ -103,9 +101,11 @@ server <- function(input, output){
   
   ##Summary Box - DataTable
   
-  sql <- 'SELECT * FROM[igenie-project:pecten_dataset.Summary_box];'
+  sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.summary_box_t];'
   retrieved_summary_data <- query_exec(project=project,  sql, billing = project)
-  retrieved_summary_data<-retrieved_summary_data[retrieved_summary_data$constituent!='DAX',]
+  retrieved_summary_data <- retrieved_summary_data[rowSums(is.na(retrieved_summary_data)) == 0,]
+  retrieved_summary_data<-retrieved_summary_data[order(retrieved_summary_data$Constituent),]
+  
   
   output$summarytable1 <- renderDataTable({
     summary_box_1(retrieved_summary_data)               
@@ -125,39 +125,36 @@ server <- function(input, output){
   
   ##Cumulative Returns - DataTable
   output$CRtable  <- renderDataTable({
-    sql <- 'SELECT * FROM [igenie-project:pecten_dataset.price_analysis] WHERE Status ="active";'
+    sql <- 'SELECT * FROM [igenie-project:pecten_dataset_test.cumulative_returns_t] WHERE STATUS ="active";'
     #sql <- 'SELECT * FROM [igenie-project:pecten_dataset_test.price_analysis] WHERE Table ="cumulative returns analysis";'
     retrieved_data <- query_exec(project=project,  sql, billing = project)
-    cumulative_returns<-retrieved_data[retrieved_data$Table=='cumulative return analysis',]
-    cumulative_returns$Date<-as.Date(cumulative_returns$Date)
-    cumulative_returns= cumulative_returns[cumulative_returns$Date==as.Date('2017-11-22'),]
-    cumulative_return_table(cumulative_returns)
+    retrieved_data$Date<-as.Date(retrieved_data$Date)
+    cumulative_return_table(retrieved_data)
   })
   
   
   ##Profitability Ranking - DataTable
   output$ranking_top  <- renderDataTable({
-    sql <- 'SELECT * FROM[igenie-project:pecten_dataset.profitability_ranking] WHERE Status = "active";'
+    sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.Profitability_tag_ranking_t] WHERE STATUS = "active";'
     retrieved_data <- query_exec(project=project,  sql, billing = project)
     retrieved_data$Date<-as.Date(retrieved_data$Date)
     #retrieved_data=retrieved_data[retrieved_data$Date==as.Date('2017-10-04'),]
     rank_n_tag(retrieved_data)
   })
   
-  ##Retrieve the fundamental data
-  sql <- 'SELECT * FROM[igenie-project:pecten_dataset.fundamental_analysis] WHERE Status ="active";'
-  fundamental_data <- query_exec(project=project,  sql, billing = project)
   
   
   ##EPS Analysis - DataTable
   output$EPS_table <- renderDataTable({
-    EPS_data<-fundamental_data[fundamental_data$Table == 'EPS analysis',]
+    sql <- 'SELECT Constituent,Current_EPS,EPS_last_year FROM[igenie-project:pecten_dataset_test.EPS_t] WHERE STATUS ="active";'
+    EPS_data <- query_exec(project=project,  sql, billing = project)
     EPS_table(EPS_data)
   })
   
   ##PER Analysis - DataTable
   output$PER_table <- renderDataTable({
-    PER_data<-fundamental_data[fundamental_data$Table == 'PER analysis',]
+    sql <- 'SELECT Constituent,Current_PER,PER_last_year FROM[igenie-project:pecten_dataset_test.PER_t] WHERE STATUS ="active";'
+    PER_data <- query_exec(project=project,  sql, billing = project)
     PER_table(PER_data)
   })
   
@@ -233,7 +230,7 @@ server <- function(input, output){
   output$recent_tweets_table <- renderDataTable({
     sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.twitter_analytics_latest_price_tweets];'
     retrieved_data <- query_exec(project=project,  sql, billing = project)
-    retrieved_data[retrieved_data$constituent=='adidas',c('constituent')] = 'Adidas'
+    #retrieved_data[retrieved_data$constituent=='adidas',c('constituent')] = 'Adidas'
     constituent = toString(input$constituent)
     recent_tweets(retrieved_data,constituent)
   })
