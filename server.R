@@ -30,9 +30,8 @@ library(treemap)
 
 server <- function(input, output){
   
-  #set_service_token("/home/ulysses/dax_project/keys/igenie-project-key.json")
-  #set_service_token("/home/ulysses/dax_project/Dashboard_R_Big_Query/service_key/igenie-project-key.json")
-  set_service_token("igenie-project-key.json")
+  #set_service_token("/Users/SparkingAries/Documents/GitHub/testfolder/igenie-project-key.json")
+  set_service_token("/Users/SparkingAries/Documents/GitHub/testfolder/igenie-project-key.json")
   project <- "igenie-project" 
   
   ######################################  Main content of the dashboard  ##############################################
@@ -47,7 +46,7 @@ server <- function(input, output){
     popular_tweet_treemap(tweet_popular_df)
   })
   
-  
+  #News
   from_date <- as.integer(as.POSIXct(strptime("2017-11-10","%Y-%m-%d"))) * 1000
   to_date <- as.integer(as.POSIXct(strptime("2017-11-16","%Y-%m-%d"))) * 1000
   
@@ -101,7 +100,7 @@ server <- function(input, output){
   
   ##Summary Box - DataTable
   
-  sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.summary_box_t];'
+  sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.summary_box];'
   retrieved_summary_data <- query_exec(project=project,  sql, billing = project)
   retrieved_summary_data <- retrieved_summary_data[rowSums(is.na(retrieved_summary_data)) == 0,]
   retrieved_summary_data<-retrieved_summary_data[order(retrieved_summary_data$Constituent),]
