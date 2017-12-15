@@ -28,7 +28,7 @@ count_tags_bar<-function(news_df,constituent){
 daily_news_sent<-function(df,constituent){
   df<-df[df$constituent==constituent,]
   df$date <- as.POSIXct(df$date)
-  df<-df[df$date>as.Date('2017-10-01'),]
+  df<-df[df$date>as.Date('2017-11-17'),]
   ggplot(data=df, aes(x=df$date, y=df$avg_sentiment,group=1))+geom_line(size=1,color='#4f9dd6')+
     geom_point(color='#4f9dd6')+
     labs(y="Average news sentiment",x="Date")+

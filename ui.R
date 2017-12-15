@@ -38,6 +38,7 @@ ui <- dashboardPage(
       menuItem("Homepage", tabName = "dashboard", icon = icon("dashboard")),
       menuItem("Market & Analysts", tabName = "analyst_prediction", icon = icon("th")),
       menuItem("Fundamental", tabName = "fundamental_analysis", icon = icon("th")),
+      menuItem("Risk Analysis", tabName = "risk", icon = icon("th")),
       selectInput("constituent", "Select a constituent:", 
                   choices=constituent_list,
                   helpText("Select Constituent")),
@@ -62,9 +63,9 @@ ui <- dashboardPage(
                 ##implement some sort of auto-height
                 tabBox( title = 'News',
                         side='right',
-                        id='tabset1',height='550px',
-                        tabPanel('All',
-                                 DT::dataTableOutput('news_all'))
+                        id='tabset1',height='550px'
+                        #tabPanel('All',
+                                 #DT::dataTableOutput('news_all'))
                         
                 )
               ),
@@ -139,6 +140,9 @@ ui <- dashboardPage(
                 ))
       ),
       
+      
+  
+      
       ############################ ANALYST PAGE ####################################
       tabItem(tabName = 'analyst_prediction',
               fluidRow(
@@ -156,6 +160,65 @@ ui <- dashboardPage(
               
               
       ),
+      
+      
+      
+      ##################################### Risk Analysis Page ###########################################
+      tabItem(tabName = 'risk',
+              fluidPage(
+                
+                # Application title
+                titlePanel("Value at Risk of your Portfolio"),
+                
+                mainPanel(
+                  
+                  h4("Instructions for use:"),
+                  h5("Build your porfolio and get the VaR value (loss as percentage) of each asset and the portfolio as a whole in three different methods."),
+                  h5("If there is just one asset selected, just ignore the weight input, submit to get result."),
+                  
+                  # Date Input
+                  dateInput(inputId = "startdate",
+                            label = "Pick your start date",
+                            value = "2016-01-01", min = NULL, max = NULL, format = "dd-mm-yyyy", startview = "month", weekstart = 1, language = "en", width = '100%'),
+                  
+                  
+                  selectInput(inputId = "portfolio",
+                              label = "Select stocks to build your portfolio",
+                              choices = c('adidas', 'Allianz', 'BASF', 'BMW', 'Bayer', 'Beiersdorf',
+                                          'Commerzbank', 'Continental', 'Daimler',
+                                          'Deutsche Bank', 'Deutsche Post',
+                                          'Deutsche Telekom', 'EON', 'Fresenius',
+                                          'Fresenius Medical Care', 'Infineon', 
+                                          'Lufthansa', 'Merck', 'SAP',
+                                          'Siemens'),
+                              selected = c('adidas','Allianz','BMW'),
+                              multiple = TRUE,
+                              selectize = TRUE, width = NULL, size = NULL),
+                  
+                  
+                  selectInput(inputId = "weights",
+                              label = "Select the weight of each asset in your porfolio accordingly",
+                              choices = seq(from = 0, to = 1.0, by = 0.01),
+                              selected = c("20%" = 0.20,
+                                           "30%" = 0.30,
+                                           "50%" = 0.50), 
+                              multiple = TRUE,
+                              selectize = TRUE, width = NULL, size = NULL),
+                  h5(
+                    "The sum of weights must be 100%, you can just type the number and select the number you want to put in"
+                  ),
+                  h5(
+                    "Please note that the weights in your portfolio will only affect the value of Portfolio VaR."
+                  ),
+                  
+                  submitButton(text = "Submit your portfolio", icon = NULL, width = NULL),
+                  
+                  #textOutput("portfolio_name")
+                  plotOutput("var_chart")),
+                tableOutput('table')
+              )
+      ),
+      
       
       
       ############################ NEWS PAGE ####################################
@@ -180,8 +243,8 @@ ui <- dashboardPage(
                 
                 box(title = 'News',
                     side='right',
-                    id='tabset2',height='500px',
-                    tabPanel('All',DT::dataTableOutput('news_analytics_topic_articles'))
+                    id='tabset2',height='500px'
+                    #tabPanel('All',DT::dataTableOutput('news_analytics_topic_articles'))
                 )
               )
       ),
