@@ -59,32 +59,32 @@ server <- function(input, output){
     popular_tweet_treemap(retrieved_data)
   })
   
-  #News
-  # from_date_temp <- as.integer(as.POSIXct(strptime(from_date,"%Y-%m-%d"))) * 1000
-  # to_date_temp <- as.integer(as.POSIXct(strptime(to_date,"%Y-%m-%d"))) * 1000
+ # News
+   from_date_temp <- as.integer(as.POSIXct(strptime(from_date,"%Y-%m-%d"))) * 1000
+   to_date_temp <- as.integer(as.POSIXct(strptime(to_date,"%Y-%m-%d"))) * 1000
   # 
-  # query <- paste0('{"NEWS_DATE_NewsDim":{"$gte":{"$date":{"$numberLong":"', from_date_temp,'"}},
-  #                 "$lte":{"$date":{"$numberLong":"', to_date_temp,'"}}},
-  #                 "constituent_id":{"$exists":true} }')
+  query <- paste0('{"NEWS_DATE_NewsDim":{"$gte":{"$date":{"$numberLong":"', from_date_temp,'"}},
+                   "$lte":{"$date":{"$numberLong":"', to_date_temp,'"}}},
+                   "constituent_id":{"$exists":true} }')
   # 
-  # news_data_all <- eventReactive(input$reload, {
-  #   sql <- 'SELECT constituent,NEWS_TITLE_NewsDim,NEWS_DATE_NewsDim,categorised_tag,sentiment FROM[igenie-project:pecten_dataset_test.news_all];'
-  #   retrieved_data <- query_exec(project=project,  sql, billing = project)
-  #   news_transform(retrieved_data)
-  #   
-  # }, ignoreNULL = FALSE)
-  # output$news_all <- DT::renderDataTable(news_data_all(),selection = 'single', server=FALSE)
-  # 
-  # observeEvent(input$news_all_rows_selected,
-  #              {
-  #                i = input$news_all_rows_selected
-  #                i <- i[length(i)]
-  #                cat(i)
-  #                showModal(modalDialog(
-  #                  title = db[i,c('NEWS_TITLE_NewsDim')],
-  #                  db[i,c('NEWS_ARTICLE_TXT_NewsDim')]
-  #                ))
-  #              })
+  news_data_all <- eventReactive(input$reload, {
+     sql <- 'SELECT constituent,NEWS_TITLE_NewsDim,NEWS_DATE_NewsDim,categorised_tag,sentiment FROM[igenie-project:pecten_dataset_test.news_all];'
+     retrieved_data <- query_exec(project=project,  sql, billing = project)
+     news_transform(retrieved_data)
+     
+   }, ignoreNULL = FALSE)
+   output$news_all <- DT::renderDataTable(news_data_all(),selection = 'single', server=FALSE)
+   
+   observeEvent(input$news_all_rows_selected,
+                {
+                  i = input$news_all_rows_selected
+                  i <- i[length(i)]
+                  cat(i)
+                  showModal(modalDialog(
+                    title = db[i,c('NEWS_TITLE_NewsDim')],
+                    db[i,c('NEWS_ARTICLE_TXT_NewsDim')]
+                ))
+               })
   # 
   
   
@@ -137,6 +137,7 @@ server <- function(input, output){
   ##Cumulative Returns - DataTable
   output$CRtable  <- renderDataTable({
     sql <- paste("SELECT * FROM [igenie-project:pecten_dataset_test.cumulative_returns] WHERE To_date= '", to_date ,"';", sep='')
+    retrieved_data <- query_exec(project=project,  sql, billing = project)
     retrieved_data<-na.omit(retrieved_data)
     retrieved_data$From_date<-strptime(retrieved_data$From_date,format = "%Y-%m-%d %H:%M:%S")
     retrieved_data$To_date<-strptime(retrieved_data$To_date,format = "%Y-%m-%d %H:%M:%S")
@@ -201,28 +202,34 @@ server <- function(input, output){
   
   ##############################  TWITTER PAGE #######################################
   output$general_twitter_target_price<-renderPlot({
-    sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.target_prices];'
-    retrieved_data <- query_exec(project=project,  sql, billing = project)
     constituent = toString(input$constituent)
+    sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.target_prices];'
+    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.target_prices] WHERE constituent =="',constituent,'";',sep='')
+    retrieved_data <- query_exec(project=project,  sql, billing = project)
+    retrieved_data<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
+    retrieved_data<-na.omit(retrieved_data)
     general_target_price_bar(retrieved_data,constituent)
   })
   
   #Deutsche Borse, bmw, henkel, infenion,Volkswagen shows error
   output$influencer_twitter_target_price<-renderPlot({
-    sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.influencer_prices];'
-    retrieved_data <- query_exec(project=project,  sql, billing = project)
     constituent = toString(input$constituent)
+    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.influencer_prices] WHERE constituent =="',constituent,'";',sep='')
+    retrieved_data<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
+    retrieved_data <- query_exec(project=project,  sql, billing = project)
     influencer_target_price_bar(retrieved_data,constituent)
   })
   
   ##Count the number of tweets for different sentiments
   output$tweet_num <-renderPlot({
-    sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.twitter_sentiment_count_daily];'
-    twitter_counts <- query_exec(project=project,  sql, billing = project)
-    twitter_counts$date<-strptime(twitter_counts$Date,format = "%Y-%m-%d %H:%M:%S")
-    twitter_counts<- twitter_counts[twitter_counts$date>=as.Date(from_date) & twitter_counts$date<=as.Date(to_date),]
-    twitter_counts<- unique(twitter_counts)
     constituent = toString(input$constituent)
+    #sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.twitter_sentiment_count_daily];'
+    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.twitter_sentiment_count_daily] WHERE constituent =="',constituent,'";', sep='')
+    twitter_counts <- query_exec(project=project,  sql, billing = project)
+    retrieved_data<-na.omit(retrieved_data)
+    twitter_counts$date<-strptime(twitter_counts$date,format = "%Y-%m-%d %H:%M:%S")
+    twitter_counts<- twitter_counts[twitter_counts$From_date==as.Date(from_date) & twitter_counts$To_date==as.Date(to_date),]
+    twitter_counts<- unique(twitter_counts)
     tweet_count(twitter_counts, constituent)
   })
   
@@ -230,20 +237,24 @@ server <- function(input, output){
   ##World Twitter Data  - Map Plot
   ##Prosiebensat1, Vonovia, Volkswagen shows error
   output$sentiment_map<-renderPlot({
-    sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.country_data];'
+    constituent = toString(input$constituent)
+    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.country_data] WHERE constituent =="',constituent,'";', sep='')
     retrieved_data <- query_exec(project=project,  sql, billing = project)
+    retrieved_data<-na.omit(retrieved_data)
     retrieved_data$date_of_analysis<-strptime(retrieved_data$date_of_analysis,format = "%Y-%m-%d")
     retrieved_data<-retrieved_data[retrieved_data$date_of_analysis >=as.Date(from_date) & retrieved_data$date_of_analysis<=as.Date(to_date) ,]
-    constituent = toString(input$constituent)
     map_sentiment(retrieved_data,constituent)
   })
   
   ##Frequency Mapping
   output$popularity_map<-renderPlot({
-    sql <- 'SELECT count,avg_sentiment,country_name,date_of_analysis FROM[igenie-project:pecten_dataset_test.country_data];'
+    constituent = toString(input$constituent)
+    sql <-paste('SELECT count,avg_sentiment,country_name,from_date,to_date FROM[igenie-project:pecten_dataset_test.country_data] WHERE constituent==',constituent,'";', sep='')
     retrieved_data <- query_exec(project=project,  sql, billing = project)
-    retrieved_data$date_of_analysis<-strptime(retrieved_data$date_of_analysis,format = "%Y-%m-%d")
-    retrieved_data<-retrieved_data[retrieved_data$date_of_analysis >=as.Date(from_date) & retrieved_data$date_of_analysis<=as.Date(to_date) ,]
+    retrieved_data<-na.omit(retrieved_data)
+    retrieved_data$to_date<-strptime(retrieved_data$to_date,format = "%Y-%m-%d")
+    retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d")
+    retrieved_data<-retrieved_data[retrieved_data$from_date ==as.Date(from_date) & retrieved_data$to_date==as.Date(to_date) ,]
     constituent = toString(input$constituent)
     map_frequency(retrieved_data,constituent)
   })
@@ -251,8 +262,10 @@ server <- function(input, output){
   
   ##Most Recent Tweets
   output$recent_tweets_table <- renderDataTable({
-    sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.twitter_analytics_latest_price_tweets];'
+    constituent = toString(input$constituent)
+    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.twitter_analytics_latest_price_tweets] WHERE constituent=="',constituent,'";', sep='')
     retrieved_data <- query_exec(project=project,  sql, billing = project)
+    #retrieved_data<-na.omit(retrieved_data)
     retrieved_data$tweet_date<- strptime(retrieved_data$tweet_date,format = "%Y-%m-%d %H:%M:%S")
     retrieved_data<-retrieved_data[retrieved_data$tweet_date >=as.Date(from_date) & retrieved_data$tweet_date<=as.Date(to_date) ,]
     constituent = toString(input$constituent)
@@ -295,32 +308,32 @@ server <- function(input, output){
   })
   
   
-  # news_analytics_topic_articles_all <- eventReactive(input$constituent, {
-  #   sql <- 'SELECT NEWS_DATE_NewsDim,constituent,categorised_tag,NEWS_TITLE_NewsDim, NEWS_ARTICLE_TXT_NewsDim FROM[igenie-project:pecten_dataset_test.news_analytics_topic_articles];'
-  #   sql<- paste("SELECT NEWS_DATE_NewsDim,constituent,categorised_tag,NEWS_TITLE_NewsDim, NEWS_ARTICLE_TXT_NewsDim FROM[igenie-project:pecten_dataset_test.news_analytics_topic_articles] WHERE From_Date =TIMESTAMP('", from_date, " UTC') AND To_Date = TIMESTAMP('", to_date, " UTC') ;",sep='')
-  #   retrieved_data <- query_exec(project=project,  sql, billing = project)
-  #   
-  #   constituent = toString(input$constituent)
-  #   news_analytics_topic_articles_func(retrieved_data,constituent)
-  # }, ignoreNULL = FALSE)
-  # 
-  # output$news_analytics_topic_articles <- DT::renderDataTable(news_analytics_topic_articles_all(),
-  #                                                             selection = 'single', server=FALSE)
-  # 
-  # observeEvent(input$news_analytics_topic_articles_rows_selected,
-  #              {
-  #                i = input$news_analytics_topic_articles_rows_selected
-  #                cat(i)
-  #                i <- i[length(i)]
-  #                constituent = toString(input$constituent)
-  #                df<-retrieved_data[retrieved_data$constituent == constituent,]
-  #                showModal(modalDialog(
-  #                  title = df[i,c('NEWS_TITLE_NewsDim')],
-  #                  df[i,c('NEWS_ARTICLE_TXT_NewsDim')]
-  #                ))
-  #              })
-  # 
-  # 
+   news_analytics_topic_articles_all <- eventReactive(input$constituent, {
+     sql <- 'SELECT NEWS_DATE_NewsDim,constituent,categorised_tag,NEWS_TITLE_NewsDim, NEWS_ARTICLE_TXT_NewsDim FROM[igenie-project:pecten_dataset_test.news_analytics_topic_articles];'
+     sql<- paste("SELECT NEWS_DATE_NewsDim,constituent,categorised_tag,NEWS_TITLE_NewsDim, NEWS_ARTICLE_TXT_NewsDim FROM[igenie-project:pecten_dataset_test.news_analytics_topic_articles] WHERE From_Date =TIMESTAMP('", from_date, " UTC') AND To_Date = TIMESTAMP('", to_date, " UTC') ;",sep='')
+     retrieved_data <- query_exec(project=project,  sql, billing = project)
+     
+     constituent = toString(input$constituent)
+     news_analytics_topic_articles_func(retrieved_data,constituent)
+   }, ignoreNULL = FALSE)
+   
+   output$news_analytics_topic_articles <- DT::renderDataTable(news_analytics_topic_articles_all(),
+                                                               selection = 'single', server=FALSE)
+   
+   observeEvent(input$news_analytics_topic_articles_rows_selected,
+                {
+                  i = input$news_analytics_topic_articles_rows_selected
+                  cat(i)
+                  i <- i[length(i)]
+                  constituent = toString(input$constituent)
+                  df<-retrieved_data[retrieved_data$constituent == constituent,]
+                  showModal(modalDialog(
+                    title = df[i,c('NEWS_TITLE_NewsDim')],
+                    df[i,c('NEWS_ARTICLE_TXT_NewsDim')]
+                  ))
+                })
+   
+ 
   
   
   ################################# Correlation Page ######################################

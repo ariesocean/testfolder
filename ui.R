@@ -63,9 +63,9 @@ ui <- dashboardPage(
                 ##implement some sort of auto-height
                 tabBox( title = 'News',
                         side='right',
-                        id='tabset1',height='550px'
-                        #tabPanel('All',
-                                 #DT::dataTableOutput('news_all'))
+                        id='tabset1',height='550px',
+                        tabPanel('All',
+                                 DT::dataTableOutput('news_all'))
                         
                 )
               ),
@@ -243,8 +243,8 @@ ui <- dashboardPage(
                 
                 box(title = 'News',
                     side='right',
-                    id='tabset2',height='500px'
-                    #tabPanel('All',DT::dataTableOutput('news_analytics_topic_articles'))
+                    id='tabset2',height='500px',
+                    tabPanel('All',DT::dataTableOutput('news_analytics_topic_articles'))
                 )
               )
       ),

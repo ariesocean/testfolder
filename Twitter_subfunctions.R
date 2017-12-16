@@ -32,7 +32,7 @@ names(constituent_names_array)<-constituents_array
 
 ## General Twitter target prices
 general_target_price_bar<-function(df,constituent){
-  df<-df[df$constituent_name==constituent_names_array[[constituent]],]
+  #df<-df[df$constituent_name==constituent_names_array[[constituent]],]
   if(mean(df$price)>=100){space=5}
   if(mean(df$price)<100){space=2}
   df$price <- as.numeric(df$price)
@@ -47,7 +47,7 @@ general_target_price_bar<-function(df,constituent){
 
 ## Influencer target prices
 influencer_target_price_bar<-function(df,constituent){
-  df<-df[df$constituent_name==constituent_names_array[[constituent]],]
+  #df<-df[df$constituent_name==constituent_names_array[[constituent]],]
   if(mean(df$price)>=100){space=5}
   if(mean(df$price)<100){space=2}
   df$price <- as.numeric(df$price)
@@ -63,9 +63,8 @@ influencer_target_price_bar<-function(df,constituent){
 
 
 #This function counts the number of positive, negative and neutral tweets for one specific stock. 
-tweet_count<-function(twitter_counts,constituent){
-  constituent_count <- twitter_counts[twitter_counts$constituent_name==constituent_names_array[[constituent]],]
-  
+tweet_count<-function(constituent_count,constituent){
+  #constituent_count <- twitter_counts[twitter_counts$constituent_name==constituent_names_array[[constituent]],]
   #if(constituent =='Adidas'){
   # constituent_count <- twitter_counts[twitter_counts$constituent=='adidas',]
   #}else{constituent_count <- twitter_counts[twitter_counts$constituent==constituent,]}
@@ -111,7 +110,7 @@ tweet_count<-function(twitter_counts,constituent){
 ##This function creates a color-coded world map according to Tweet Frequency
 map_frequency<-function(country_df,constituent){
   #title_str = paste('Tweeting frequency for ',constituent,' by countries',sep='')
-  df<-country_df[country_df$constituent_name==constituent_names_array[[constituent]],c("count","avg_sentiment",'country_name')]
+  df<-country_df[,c("count","avg_sentiment",'country_name')]
   n <- joinCountryData2Map(df, joinCode="ISO2", nameJoinColumn="country_name")
   par(mar=c(0,0,0,0))
   mapCountryData(n, nameColumnToPlot="count", mapTitle='',colourPalette=rwmGetColours(c('#F5EEF8','#D7BDE2','#9B59B6','#7D3C98'),4))
@@ -122,7 +121,7 @@ map_frequency<-function(country_df,constituent){
 ##Find the minimum/maximum of the sentiment, in order to decide the range of colors.
 map_sentiment<-function(country_df,constituent){
   #title_str = paste('Twitter sentiment for ',constituent,' by countries',sep='')
-  df<-country_df[country_df$constituent_name==constituent_names_array[[constituent]],c("count","avg_sentiment",'country_name')]
+  df<-country_df[,c("count","avg_sentiment",'country_name')]
   min_sent<-min(df$avg_sentiment, na.rm=T)
   max_sent<-max(df$avg_sentiment, na.rm=T)
   if ((min_sent<=0)&(max_sent>=0)){palette_color = c('red','#EB984E','#FFCC00','#1E8449')}
