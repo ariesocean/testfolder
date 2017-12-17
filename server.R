@@ -139,7 +139,7 @@ server <- function(input, output){
     sql <- paste("SELECT * FROM [igenie-project:pecten_dataset_test.cumulative_returns] WHERE To_date= '", to_date ,"';", sep='')
     retrieved_data <- query_exec(project=project,  sql, billing = project)
     retrieved_data<-na.omit(retrieved_data)
-    retrieved_data$From_date<-strptime(retrieved_data$From_date,format = "%Y-%m-%d %H:%M:%S")
+    retrieved_data$From_date<- strptime(retrieved_data$From_date,format = "%Y-%m-%d %H:%M:%S")
     retrieved_data$To_date<-strptime(retrieved_data$To_date,format = "%Y-%m-%d %H:%M:%S")
     retrieved_data[retrieved_data$From_date==as.Date(from_date) & retrieved_data$To_date==as.Date(to_date),]
     cumulative_return_table(retrieved_data)
@@ -187,25 +187,29 @@ server <- function(input, output){
   
   
   ####################################### Risk Analysis ###########################################
-  output$var_chart <- renderPlot({
-    #step1 get the input ready
-    maxDate <- input$startdate
-    tickers <- input$portfolio
-    weights <- as.numeric(input$weights)
-    n <- length(tickers)
-    var_table <- value_at_risk(maxDate,tickers, weights, n)
-    
-    ggplot(var_table, aes(x=Type, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge")
-    
-  })
-  
+  # output$var_chart <- renderPlot({
+  #   #step1 get the input ready
+  #   maxDate <- input$startdate
+  #   tickers <- input$portfolio
+  #   weights <- as.numeric(input$weights)
+  #   n <- length(tickers)
+  #   var_table <- value_at_risk(maxDate,tickers, weights, n)
+  #   
+  #   ggplot(var_table, aes(x=Type, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge")
+  #   
+  # })
+  # 
   
   ##############################  TWITTER PAGE #######################################
   output$general_twitter_target_price<-renderPlot({
     constituent = toString(input$constituent)
+    if (constituent =="Adidas"){constituent = 'adidas'}
+    ## No new twitter target prices
     sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.target_prices];'
-    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.target_prices] WHERE constituent =="',constituent,'";',sep='')
+    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.target_prices] WHERE constituent ="',constituent,'";',sep='')
     retrieved_data <- query_exec(project=project,  sql, billing = project)
+    retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d" )
+    retrieved_data$to_date<-strptime(retrieved_data$to_date,format = "%Y-%m-%d")
     retrieved_data<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
     retrieved_data<-na.omit(retrieved_data)
     general_target_price_bar(retrieved_data,constituent)
@@ -213,22 +217,30 @@ server <- function(input, output){
   
   #Deutsche Borse, bmw, henkel, infenion,Volkswagen shows error
   output$influencer_twitter_target_price<-renderPlot({
+    # No new twitter target prices
     constituent = toString(input$constituent)
-    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.influencer_prices] WHERE constituent =="',constituent,'";',sep='')
-    retrieved_data<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
+    if (constituent =="Adidas"){constituent = 'adidas'}
+    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.influencer_prices] WHERE constituent ="',constituent,'";',sep='')
     retrieved_data <- query_exec(project=project,  sql, billing = project)
+    retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d" )
+    retrieved_data$to_date<-strptime(retrieved_data$to_date,format = "%Y-%m-%d")
+    retrieved_data<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
     influencer_target_price_bar(retrieved_data,constituent)
   })
   
   ##Count the number of tweets for different sentiments
   output$tweet_num <-renderPlot({
     constituent = toString(input$constituent)
+    if (constituent =="Adidas"){constituent = 'adidas'}
     #sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.twitter_sentiment_count_daily];'
-    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.twitter_sentiment_count_daily] WHERE constituent =="',constituent,'";', sep='')
+    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.twitter_sentiment_count_daily] WHERE constituent ="',constituent,'";', sep='')
     twitter_counts <- query_exec(project=project,  sql, billing = project)
-    retrieved_data<-na.omit(retrieved_data)
-    twitter_counts$date<-strptime(twitter_counts$date,format = "%Y-%m-%d %H:%M:%S")
-    twitter_counts<- twitter_counts[twitter_counts$From_date==as.Date(from_date) & twitter_counts$To_date==as.Date(to_date),]
+    twitter_counts<-na.omit(twitter_counts)
+    twitter_counts$From_date<- strptime(twitter_counts$From_date,format = "%Y-%m-%d %H:%M:%S")
+    twitter_counts$To_date<- strptime(twitter_counts$To_date,format = "%Y-%m-%d %H:%M:%S")
+    twitter_counts<-twitter_counts[twitter_counts$From_date == as.Date(from_date) & twitter_counts$To_date == as.Date(to_date),]
+    #twitter_counts$date<-strptime(twitter_counts$date,format = "%Y-%m-%d %H:%M:%S")
+    #twitter_counts<- twitter_counts[twitter_counts$From_date==as.Date(from_date) & twitter_counts$To_date==as.Date(to_date),]
     twitter_counts<- unique(twitter_counts)
     tweet_count(twitter_counts, constituent)
   })
@@ -238,38 +250,43 @@ server <- function(input, output){
   ##Prosiebensat1, Vonovia, Volkswagen shows error
   output$sentiment_map<-renderPlot({
     constituent = toString(input$constituent)
-    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.country_data] WHERE constituent =="',constituent,'";', sep='')
+    if (constituent =="Adidas"){constituent = 'adidas'}
+    sql <- paste('SELECT count,avg_sentiment,country_name,constituent,from_date,to_date FROM[igenie-project:pecten_dataset_test.country_data] WHERE constituent ="',constituent,'";', sep='')
     retrieved_data <- query_exec(project=project,  sql, billing = project)
     retrieved_data<-na.omit(retrieved_data)
-    retrieved_data$date_of_analysis<-strptime(retrieved_data$date_of_analysis,format = "%Y-%m-%d")
-    retrieved_data<-retrieved_data[retrieved_data$date_of_analysis >=as.Date(from_date) & retrieved_data$date_of_analysis<=as.Date(to_date) ,]
+    #retrieved_data$date_of_analysis<-strptime(retrieved_data$date_of_analysis,format = "%Y-%m-%d")
+    retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d" )
+    retrieved_data$to_date<-strptime(retrieved_data$to_date,format = "%Y-%m-%d")
+    retrieved_data<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
+    #retrieved_data<-retrieved_data[retrieved_data$date_of_analysis >=as.Date(from_date) & retrieved_data$date_of_analysis<=as.Date(to_date) ,]
     map_sentiment(retrieved_data,constituent)
   })
   
   ##Frequency Mapping
   output$popularity_map<-renderPlot({
-    constituent = toString(input$constituent)
-    sql <-paste('SELECT count,avg_sentiment,country_name,from_date,to_date FROM[igenie-project:pecten_dataset_test.country_data] WHERE constituent==',constituent,'";', sep='')
-    retrieved_data <- query_exec(project=project,  sql, billing = project)
-    retrieved_data<-na.omit(retrieved_data)
-    retrieved_data$to_date<-strptime(retrieved_data$to_date,format = "%Y-%m-%d")
-    retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d")
-    retrieved_data<-retrieved_data[retrieved_data$from_date ==as.Date(from_date) & retrieved_data$to_date==as.Date(to_date) ,]
-    constituent = toString(input$constituent)
-    map_frequency(retrieved_data,constituent)
+     constituent = toString(input$constituent)
+     sql <-paste('SELECT count,avg_sentiment,country_name,constituent,from_date,to_date FROM[igenie-project:pecten_dataset_test.country_data] WHERE constituent="',constituent,'";', sep='')
+     retrieved_data <- query_exec(project=project,  sql, billing = project)
+     retrieved_data<-na.omit(retrieved_data)
+     retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d" )
+     retrieved_data$to_date<-strptime(retrieved_data$to_date,format = "%Y-%m-%d")
+     retrieved_data<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
+     map_frequency(retrieved_data,constituent)
   })
   
   
   ##Most Recent Tweets
   output$recent_tweets_table <- renderDataTable({
     constituent = toString(input$constituent)
-    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.twitter_analytics_latest_price_tweets] WHERE constituent=="',constituent,'";', sep='')
+    if (constituent =="Adidas"){constituent = 'adidas'}
+    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.twitter_analytics_latest_price_tweets] WHERE constituent="',constituent,'";', sep='')
     retrieved_data <- query_exec(project=project,  sql, billing = project)
     #retrieved_data<-na.omit(retrieved_data)
-    retrieved_data$tweet_date<- strptime(retrieved_data$tweet_date,format = "%Y-%m-%d %H:%M:%S")
-    retrieved_data<-retrieved_data[retrieved_data$tweet_date >=as.Date(from_date) & retrieved_data$tweet_date<=as.Date(to_date) ,]
-    constituent = toString(input$constituent)
-    recent_tweets(retrieved_data,constituent)
+    #retrieved_data$tweet_date<- strptime(retrieved_data$tweet_date,format = "%Y-%m-%d %H:%M:%S")
+    retrieved_data$to_date<-strptime(retrieved_data$to_date,format = "%Y-%m-%d")
+    retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d")
+    #retrieved_data<-retrieved_data[retrieved_data$from_date ==as.Date(from_date) & retrieved_data$to_date==as.Date(to_date) ,]
+    recent_tweets(retrieved_data)
   })
   
   
@@ -277,30 +294,34 @@ server <- function(input, output){
   
   ##News Tagging Count - Multicolored Vertical Bar Chart
   output$news_tag_bar<-renderPlot({
-    sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.news_tag];'
+    constituent <-toString(input$constituent)
+    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.news_tag] WHERE constituent="',constituent,'";', sep='')
     retrieved_data <- query_exec(project=project,  sql, billing = project)
     retrieved_data$Date <-as.Date(retrieved_data$Date)
     retrieved_data<-retrieved_data[retrieved_data$Tags!='None',]
     retrieved_data <-retrieved_data[retrieved_data$Date >= as.Date(from_date) & retrieved_data$Date<=as.Date(to_date) ,]
-    constituent <-toString(input$constituent)
     count_tags_bar(retrieved_data ,constituent)
   })
   
   
   ##News Sentiment Trend - Line Graph
   output$news_sentiment_daily<-renderPlot({
-    sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.news_analytics_daily_sentiment];'
-    retrieved_data <- query_exec(project=project,  sql, billing = project)
-    retrieved_data$date <-as.Date(retrieved_data$date)
-    retrieved_data <-retrieved_data[retrieved_data$date >= as.Date(from_date) & retrieved_data$date<=as.Date(to_date) ,]
     constituent <-toString(input$constituent)
+    if (constituent == 'Adidas'){constituent = "adidas"}
+    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.news_analytics_daily_sentiment] WHERE constituent="',constituent,'";', sep='')
+    retrieved_data <- query_exec(project=project,  sql, billing = project)
+    retrieved_data$To_date<-strptime(retrieved_data$To_date,format = "%Y-%m-%d")
+    retrieved_data$From_date<-strptime(retrieved_data$From_date,format = "%Y-%m-%d")
+    #retrieved_data$date <-as.Date(retrieved_data$date)
+    retrieved_data <-retrieved_data[retrieved_data$From_date == as.Date(from_date) & retrieved_data$To_date==as.Date(to_date) ,]
     daily_news_sent(retrieved_data,constituent)
   })
   
   
   ##News sentiment by Category - Heatmap
   output$topic_sentiment_grid<-renderPlot({
-    sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.news_analytics_topic_sentiment];'
+    constituent <-toString(input$constituent)
+    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.news_analytics_topic_sentiment] WHERE constituent="',constituent,'";', sep='')
     retrieved_data <- query_exec(project=project,  sql, billing = project)
     retrieved_data$date<- strptime(retrieved_data$date,format = "%Y-%m-%d %H:%M:%S")
     constituent <-toString(input$constituent)
@@ -309,11 +330,12 @@ server <- function(input, output){
   
   
    news_analytics_topic_articles_all <- eventReactive(input$constituent, {
-     sql <- 'SELECT NEWS_DATE_NewsDim,constituent,categorised_tag,NEWS_TITLE_NewsDim, NEWS_ARTICLE_TXT_NewsDim FROM[igenie-project:pecten_dataset_test.news_analytics_topic_articles];'
+     constituent = toString(input$constituent)
+     if (constituent == 'Adidas'){constituent = "adidas"}
+     #sql <- 'SELECT NEWS_DATE_NewsDim,constituent,categorised_tag,NEWS_TITLE_NewsDim, NEWS_ARTICLE_TXT_NewsDim FROM[igenie-project:pecten_dataset_test.news_analytics_topic_articles];'
      sql<- paste("SELECT NEWS_DATE_NewsDim,constituent,categorised_tag,NEWS_TITLE_NewsDim, NEWS_ARTICLE_TXT_NewsDim FROM[igenie-project:pecten_dataset_test.news_analytics_topic_articles] WHERE From_Date =TIMESTAMP('", from_date, " UTC') AND To_Date = TIMESTAMP('", to_date, " UTC') ;",sep='')
      retrieved_data <- query_exec(project=project,  sql, billing = project)
-     
-     constituent = toString(input$constituent)
+     retrieved_data<- retrieved_data[retrieved_data$constituent == constituent,]
      news_analytics_topic_articles_func(retrieved_data,constituent)
    }, ignoreNULL = FALSE)
    
@@ -326,6 +348,8 @@ server <- function(input, output){
                   cat(i)
                   i <- i[length(i)]
                   constituent = toString(input$constituent)
+                  if (constituent == 'Adidas'){constituent = "adidas"}
+                  if (constituent == 'Thyssenkrupp'){constituent = "thyssenkrupp"}
                   df<-retrieved_data[retrieved_data$constituent == constituent,]
                   showModal(modalDialog(
                     title = df[i,c('NEWS_TITLE_NewsDim')],
@@ -337,15 +361,16 @@ server <- function(input, output){
   
   
   ################################# Correlation Page ######################################
-  sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.all_correlations];'
+  sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.all_correlations] WHERE constituent="',constituent,'";', sep='')
   correlation_data <- query_exec(project=project,  sql, billing = project)
-  correlation_data$Date<-as.Date(correlation_data$Date)
+  #correlation_data$Date<-as.Date(correlation_data$Date)
+  correlation_data$Date<-strptime(correlation_data$Date,format = "%Y-%m-%d")
+  #correlation_data<-na.omit(correlation_data)
   correlation_data<-correlation_data[correlation_data$Date>=as.Date(from_date) & correlation_data$Date<=as.Date(to_date),]
   
   ## News Sentiment line
   output$news_behavior_line <- renderPlotly({
     constituent = toString(input$constituent)
-    correlation_data<-correlation_data[correlation_data$Constituent==constituent,]
     correlation_news(correlation_data,constituent)
   })
   
@@ -353,7 +378,6 @@ server <- function(input, output){
   ## Twitter Sentiment line
   output$twitter_behavior_line <- renderPlotly({
     constituent = toString(input$constituent)
-    correlation_data<-correlation_data[correlation_data$Constituent==constituent,]
     correlation_twitter(correlation_data,constituent)
   })
   

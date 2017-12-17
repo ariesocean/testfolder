@@ -68,15 +68,17 @@ tweet_count<-function(constituent_count,constituent){
   #if(constituent =='Adidas'){
   # constituent_count <- twitter_counts[twitter_counts$constituent=='adidas',]
   #}else{constituent_count <- twitter_counts[twitter_counts$constituent==constituent,]}
+  if (constituent == "adidas"){constituent == "Adidas"}
   
-  pos_line = constituent_count[constituent_count$line=='Positive',c("count")]
-  neg_line = constituent_count[constituent_count$line=='Negative',c("count")]
-  neu_line = constituent_count[constituent_count$line=='Neutral',c("count")]
+  pos_line = constituent_count[constituent_count$line=='positive',c("count")]
+  neg_line = constituent_count[constituent_count$line=='negative',c("count")]
+  neu_line = constituent_count[constituent_count$line=='neutral',c("count")]
   
   n=max(length(pos_line),length(neu_line),length(neg_line))
   if (length(pos_line)<n){pos_line<-append(pos_line,rep(0,n-length(pos_line)),after=min(pos_line))}
   if (length(neu_line)<n){neu_line<-append(neu_line,rep(0,n-length(neu_line)),after=min(neu_line))}
   if (length(neg_line)<n){neg_line<-append(neg_line,rep(0,n-length(neg_line)),after=min(neg_line))}
+  
   
   title_str = paste('Number of Tweets for ',constituent,sep='')
   
@@ -84,8 +86,8 @@ tweet_count<-function(constituent_count,constituent){
   #neg_line <- append(neg_line,0,after=min(neg_line))}
   date_range <-unique(constituent_count$date)
   date_range <- as.Date(date_range,"%Y-%m-%d")
-  date_range<-gsub("-", "/", date_range)
-  date_range <- as.Date(date_range,"%Y/%m/%d")
+  #date_range<-gsub("-", "/", date_range)
+  #date_range <- as.Date(date_range,"%Y/%m/%d")
   
   #To short-fix inconsistent record
   if (length(date_range)>length(pos_line)){
@@ -134,11 +136,11 @@ map_sentiment<-function(country_df,constituent){
 }
 
 
-recent_tweets<-function(retrieved_data,constituent){
-  df<-retrieved_data[retrieved_data$constituent_name ==constituent_names_array[[constituent]],]
+recent_tweets<-function(df){
   
   table<- datatable(df[,c('text','sentiment_score')],rownames=FALSE, options = list(pageLength = 5),colnames = c('Tweet','Sentiment'),escape=FALSE) %>%
     formatStyle('sentiment_score',
                 color = styleInterval(c(-1,0),c('red','#FFCC00','#1E8449')),
                 backgroundColor = styleInterval(c(-1,0),c('red','#FFCC00','#1E8449')))
+  table
 }

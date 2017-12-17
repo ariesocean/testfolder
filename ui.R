@@ -14,11 +14,9 @@ constituent_list = c('Adidas', 'Allianz', 'BASF', 'BMW', 'Bayer', 'Beiersdorf',
                      'Lufthansa', 'Merck', 'SAP',
                      'Siemens')
 
-length(constituent_list)
 ui <- dashboardPage(
   dashboardHeader( 
     title = 'iGenie Analytics',
-    
     dropdownMenu(
       type = "messages", 
       #icon = icon("exclamation-triangle"),
@@ -177,46 +175,46 @@ ui <- dashboardPage(
                   h5("If there is just one asset selected, just ignore the weight input, submit to get result."),
                   
                   # Date Input
-                  dateInput(inputId = "startdate",
-                            label = "Pick your start date",
-                            value = "2016-01-01", min = NULL, max = NULL, format = "dd-mm-yyyy", startview = "month", weekstart = 1, language = "en", width = '100%'),
-                  
-                  
-                  selectInput(inputId = "portfolio",
-                              label = "Select stocks to build your portfolio",
-                              choices = c('adidas', 'Allianz', 'BASF', 'BMW', 'Bayer', 'Beiersdorf',
-                                          'Commerzbank', 'Continental', 'Daimler',
-                                          'Deutsche Bank', 'Deutsche Post',
-                                          'Deutsche Telekom', 'EON', 'Fresenius',
-                                          'Fresenius Medical Care', 'Infineon', 
-                                          'Lufthansa', 'Merck', 'SAP',
-                                          'Siemens'),
-                              selected = c('adidas','Allianz','BMW'),
-                              multiple = TRUE,
-                              selectize = TRUE, width = NULL, size = NULL),
-                  
-                  
-                  selectInput(inputId = "weights",
-                              label = "Select the weight of each asset in your porfolio accordingly",
-                              choices = seq(from = 0, to = 1.0, by = 0.01),
-                              selected = c("20%" = 0.20,
-                                           "30%" = 0.30,
-                                           "50%" = 0.50), 
-                              multiple = TRUE,
-                              selectize = TRUE, width = NULL, size = NULL),
+                  # dateInput(inputId = "startdate",
+                  #           label = "Pick your start date",
+                  #           value = "2016-01-01", min = NULL, max = NULL, format = "dd-mm-yyyy", startview = "month", weekstart = 1, language = "en", width = '100%'),
+                  # 
+                  # 
+                  # selectInput(inputId = "portfolio",
+                  #             label = "Select stocks to build your portfolio",
+                  #             choices = c('adidas', 'Allianz', 'BASF', 'BMW', 'Bayer', 'Beiersdorf',
+                  #                         'Commerzbank', 'Continental', 'Daimler',
+                  #                         'Deutsche Bank', 'Deutsche Post',
+                  #                         'Deutsche Telekom', 'EON', 'Fresenius',
+                  #                         'Fresenius Medical Care', 'Infineon', 
+                  #                         'Lufthansa', 'Merck', 'SAP',
+                  #                         'Siemens'),
+                  #             selected = c('adidas','Allianz','BMW'),
+                  #             multiple = TRUE,
+                  #             selectize = TRUE, width = NULL, size = NULL),
+                  # 
+                  # 
+                  # selectInput(inputId = "weights",
+                  #             label = "Select the weight of each asset in your porfolio accordingly",
+                  #             choices = seq(from = 0, to = 1.0, by = 0.01),
+                  #             selected = c("20%" = 0.20,
+                  #                          "30%" = 0.30,
+                  #                          "50%" = 0.50), 
+                  #             multiple = TRUE,
+                  #             selectize = TRUE, width = NULL, size = NULL),
                   h5(
                     "The sum of weights must be 100%, you can just type the number and select the number you want to put in"
                   ),
                   h5(
                     "Please note that the weights in your portfolio will only affect the value of Portfolio VaR."
-                  ),
+                  )
                   
-                  submitButton(text = "Submit your portfolio", icon = NULL, width = NULL),
+                  #submitButton(text = "Submit your portfolio", icon = NULL, width = NULL),
                   
                   #textOutput("portfolio_name")
-                  plotOutput("var_chart")),
-                tableOutput('table')
-              )
+                  #plotOutput("var_chart")),
+                #tableOutput('table')
+              ))
       ),
       
       
@@ -273,25 +271,27 @@ ui <- dashboardPage(
       ############################ TWITTER PAGE ####################################
       tabItem(tabName = 'twitter_analysis',
               fluidRow(
-                tabBox(title=h4("Twitter Target Price"), height=500,side='right',
-                       tabPanel('General',
-                                plotOutput("general_twitter_target_price", height=420)),
-                       
-                       tabPanel('Influencer',
-                                plotOutput("influencer_twitter_target_price", height=420))),
+                # tabBox(title=h4("Twitter Target Price"), height=500,side='right',
+                #        tabPanel('General',
+                #                 plotOutput("general_twitter_target_price", height=420)),
+                #        
+                #        tabPanel('Influencer',
+                #                 plotOutput("influencer_twitter_target_price", height=420))),
                 
-                tabBox(title = h4('Twitter Analysis by Countries'),height=500,side='right',
-                       tabPanel('Sentiment',
-                                plotOutput('sentiment_map',height=400)),
-                       tabPanel('Frequency',
-                                plotOutput('popularity_map',height=400)))),
-              
+                 tabBox(title = h4('Twitter Analysis by Countries'),
+                        height=500,side='right',
+                        tabPanel('Sentiment',
+                                 plotOutput('sentiment_map',height=400)),
+                        tabPanel('Frequency',
+                                 plotOutput('popularity_map',height=400))
+                        )),
+                 
               
               fluidRow(  
-                box(title='Twitter Sentiment Count',
-                    align='center',
-                    plotOutput('tweet_num',height=400),
-                    height=500),
+                 box(title='Twitter Sentiment Count',
+                     align='center',
+                     plotOutput('tweet_num',height=400),
+                     height=500),
                 
                 box(title='Recent Tweets',
                     align='center',
