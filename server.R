@@ -188,6 +188,7 @@ server <- function(input, output){
   
   ####################################### Risk Analysis ###########################################
   # output$var_chart <- renderPlot({
+     input$submit
   #   #step1 get the input ready
   #   maxDate <- input$startdate
   #   tickers <- input$portfolio
