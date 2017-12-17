@@ -209,7 +209,7 @@ ui <- dashboardPage(
                     "Please note that the weights in your portfolio will only affect the value of Portfolio VaR."
                   )
                   
-                  #submitButton(text = "Submit your portfolio", icon = NULL, width = NULL),
+                  #actionButton("submit", "Submit your portfolio"),
                   
                   #textOutput("portfolio_name")
                   #plotOutput("var_chart")),
