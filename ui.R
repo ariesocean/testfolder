@@ -176,52 +176,51 @@ ui <- dashboardPage(
                   
                   #Date Input
                   dateInput(inputId = "startdate",
-                            label = "Pick your start date",
-                            value = "2016-01-01", min = NULL, max = NULL, format = "dd-mm-yyyy", startview = "month", weekstart = 1, language = "en", width = '100%'),
-
-
+                             label = "Pick your start date",
+                             value = "2016-01-01", min = NULL, max = NULL, format = "dd-mm-yyyy", startview = "month", weekstart = 1, language = "en", width = '100%'),
+                   
+                   
                   selectInput(inputId = "portfolio",
-                              label = "Select stocks to build your portfolio",
-                              choices = c('adidas', 'Allianz', 'BASF', 'BMW', 'Bayer', 'Beiersdorf',
-                                          'Commerzbank', 'Continental', 'Daimler',
-                                          'Deutsche Bank', 'Deutsche Post',
-                                          'Deutsche Telekom', 'EON', 'Fresenius',
-                                          'Fresenius Medical Care', 'Infineon',
-                                          'Lufthansa', 'Merck', 'SAP',
-                                          'Siemens'),
-                              selected = c('adidas','Allianz','BMW'),
-                              multiple = TRUE,
-                              selectize = TRUE, width = NULL, size = NULL),
-
-
+                               label = "Select stocks to build your portfolio",
+                               choices = c('adidas', 'Allianz', 'BASF', 'BMW', 'Bayer', 'Beiersdorf',
+                                           'Commerzbank', 'Continental', 'Daimler',
+                                           'Deutsche Bank', 'Deutsche Post',
+                                           'Deutsche Telekom', 'EON', 'Fresenius',
+                                           'Fresenius Medical Care', 'Infineon', 
+                                           'Lufthansa', 'Merck', 'SAP',
+                                           'Siemens'),
+                               selected = c('adidas','Allianz','BMW'),
+                               multiple = TRUE,
+                               selectize = TRUE, width = NULL, size = NULL),
+                   
+                   
                   selectInput(inputId = "weights",
-                              label = "Select the weight of each asset in your porfolio accordingly",
-                              choices = seq(from = 0, to = 1.0, by = 0.01),
-                              selected = c("20%" = 0.20,
-                                           "30%" = 0.30,
-                                           "50%" = 0.50),
-                              multiple = TRUE,
-                              selectize = TRUE, width = NULL, size = NULL),
+                               label = "Select the weight of each asset in your porfolio accordingly",
+                               choices = seq(from = 0, to = 1.0, by = 0.01),
+                               selected = c("20%" = 0.20,
+                                            "30%" = 0.30,
+                                            "50%" = 0.50), 
+                               multiple = TRUE,
+                               selectize = TRUE, width = NULL, size = NULL),
+                  
                   h5(
                     "The sum of weights must be 100%, you can just type the number and select the number you want to put in"
                   ),
                   h5(
-                    "Please note that the weights in your portfolio will only affect the value of Portfolio VaR."
-                  ),
+                    "Please note that the weights in your portfolio will only affect the value of Portfolio VaR."),
                   
                   actionButton("submit", "Submit your portfolio"),
+                  #submitButton(text = "Submit your portfolio", icon = NULL, width = NULL),
                   
-                  #textOutput("portfolio_name")
-                  plotOutput("var_chart"))
-                  #tableOutput('table')
+                  textOutput("portfolio_name"),
+                  plotOutput("var_chart")),
+                tableOutput('table')
               )
       ),
       
       
       
-      
-      ###########
-      ################# NEWS PAGE ####################################
+      ############################ NEWS PAGE ####################################
       tabItem(tabName = 'news_analysis',
               fluidRow(
                 box(title= 'News Category Count',

@@ -31,7 +31,7 @@ library(treemap)
 server <- function(input, output){
   
   #set_service_token("/Users/SparkingAries/Documents/GitHub/testfolder/igenie-project-key.json")
-  #set_service_token('/Users/kefei/Documents/Igenie_Consulting/keys/igenie-project-key.json')
+  set_service_token('/Users/kefei/Documents/Igenie_Consulting/keys/igenie-project-key.json')
   set_service_token("igenie-project-key.json")
   project <- "igenie-project" 
   #from_date <- as.Date('2017-11-17')
@@ -60,33 +60,31 @@ server <- function(input, output){
   })
   
  # News
-   from_date_temp <- as.integer(as.POSIXct(strptime(from_date,"%Y-%m-%d"))) * 1000
-   to_date_temp <- as.integer(as.POSIXct(strptime(to_date,"%Y-%m-%d"))) * 1000
-  # 
-  query <- paste0('{"NEWS_DATE_NewsDim":{"$gte":{"$date":{"$numberLong":"', from_date_temp,'"}},
-                   "$lte":{"$date":{"$numberLong":"', to_date_temp,'"}}},
-                   "constituent_id":{"$exists":true} }')
-  # 
-  news_data_all <- eventReactive(input$reload, {
-     sql <- 'SELECT constituent,NEWS_TITLE_NewsDim,NEWS_DATE_NewsDim,categorised_tag,sentiment FROM[igenie-project:pecten_dataset_test.news_all];'
+   #from_date_temp <- as.integer(as.POSIXct(strptime(from_date,"%Y-%m-%d"))) * 1000
+   #to_date_temp <- as.integer(as.POSIXct(strptime(to_date,"%Y-%m-%d"))) * 1000
+
+  news_data_all <- eventReactive(input$constituent, {
+     sql <- 'SELECT constituent,NEWS_TITLE_NewsDim,NEWS_DATE_NewsDim,NEWS_ARTICLE_TXT_NewsDim,categorised_tag,sentiment FROM[igenie-project:pecten_dataset_test.news_all];'
      retrieved_data <- query_exec(project=project,  sql, billing = project)
      news_transform(retrieved_data)
-     
    }, ignoreNULL = FALSE)
    output$news_all <- DT::renderDataTable(news_data_all(),selection = 'single', server=FALSE)
    
    observeEvent(input$news_all_rows_selected,
                 {
                   i = input$news_all_rows_selected
-                  i <- i[length(i)]
                   cat(i)
+                  i <- i[length(i)]
                   showModal(modalDialog(
-                    title = db[i,c('NEWS_TITLE_NewsDim')],
-                    db[i,c('NEWS_ARTICLE_TXT_NewsDim')]
+                    title = retrieved_data[i,c('NEWS_TITLE_NewsDim')],
+                    retrieved_data[i,c('NEWS_ARTICLE_TXT_NewsDim')]
                 ))
                })
-  # 
   
+   
+   
+   
+   
   
   ##For analyst opinions
   sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.analyst_opinions];'
@@ -188,18 +186,18 @@ server <- function(input, output){
   
   ####################################### Risk Analysis ###########################################
   output$var_chart <- renderPlot({
+  #   #step1 get the input ready
     input$submit
-    #step1 get the input ready
-    maxDate <- input$startdate
-    tickers <- input$portfolio
-    weights <- as.numeric(input$weights)
-    n <- length(tickers)
-    var_table <- value_at_risk(maxDate,tickers, weights, n)
-
-    ggplot(var_table, aes(x=Type, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge")
-
-  })
-
+     maxDate <- input$startdate
+     tickers <- input$portfolio
+     weights <- as.numeric(input$weights)
+     n <- length(tickers)
+     var_table <- value_at_risk(maxDate,tickers, weights, n)
+     
+     ggplot(var_table, aes(x=Type, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge")
+     
+   })
+  # 
   
   ##############################  TWITTER PAGE #######################################
   output$general_twitter_target_price<-renderPlot({
@@ -353,6 +351,7 @@ server <- function(input, output){
                   if (constituent == 'Thyssenkrupp'){constituent = "thyssenkrupp"}
                   df<-retrieved_data[retrieved_data$constituent == constituent,]
                   showModal(modalDialog(
+                    constituent,
                     title = df[i,c('NEWS_TITLE_NewsDim')],
                     df[i,c('NEWS_ARTICLE_TXT_NewsDim')]
                   ))
@@ -362,24 +361,27 @@ server <- function(input, output){
   
   
   ################################# Correlation Page ######################################
-  sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.all_correlations] WHERE constituent="',constituent,'";', sep='')
+  sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.all_correlations];'
   correlation_data <- query_exec(project=project,  sql, billing = project)
   #correlation_data$Date<-as.Date(correlation_data$Date)
   correlation_data$Date<-strptime(correlation_data$Date,format = "%Y-%m-%d")
   #correlation_data<-na.omit(correlation_data)
+
   correlation_data<-correlation_data[correlation_data$Date>=as.Date(from_date) & correlation_data$Date<=as.Date(to_date),]
   
   ## News Sentiment line
   output$news_behavior_line <- renderPlotly({
     constituent = toString(input$constituent)
-    correlation_news(correlation_data,constituent)
+    df<-correlation_data[correlation_data$Constituent==constituent,]
+    correlation_news(df,constituent)
   })
   
   
   ## Twitter Sentiment line
   output$twitter_behavior_line <- renderPlotly({
     constituent = toString(input$constituent)
-    correlation_twitter(correlation_data,constituent)
+    df<-correlation_data[correlation_data$Constituent==constituent,]
+    correlation_twitter(df,constituent)
   })
   
   

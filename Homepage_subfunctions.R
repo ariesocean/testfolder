@@ -82,7 +82,7 @@ news_transform<-function(db){
   db$NEWS_DATE_NewsDim<- as.Date(db$NEWS_DATE_NewsDim,format='%d/%m/%Y')
   db<- db[order(-as.numeric(db$NEWS_DATE_NewsDim)),] ##order by release dates, descending
   
-  db <- db[1:30,]
+  #db <- db[1:30,]
   #make sure the news link only contains 8 characters from the headline. 
   db$NEWS_TITLE_NewsDim <- as.character(db$NEWS_TITLE_NewsDim)
   db$NEWS_TITLE_NewsDim <- unlist(lapply(db$NEWS_TITLE_NewsDim, string_fun)) ##Apply the limit
@@ -99,9 +99,6 @@ news_transform<-function(db){
   db$sentiment[index_neu]=0
   
   ##Fix the capital letters
-  #db[db$constituent=='bmw',c('constituent')]='BMW'
-  #db[!is.na(db$constituent) & db$constituent=='bmw', c('constituent')] ='BMW'
-  
   #db$Newslink<-paste('<a href="',db$Link,'">',db$Headline ,'</a>',sep="") #embed the hyperlink in headlines
   
   #db[db['constituent']=='adidas',c('constituent')]<-'Adidas'
