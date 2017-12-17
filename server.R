@@ -31,7 +31,7 @@ library(treemap)
 server <- function(input, output){
   
   #set_service_token("/Users/SparkingAries/Documents/GitHub/testfolder/igenie-project-key.json")
-  set_service_token('/Users/kefei/Documents/Igenie_Consulting/keys/igenie-project-key.json')
+  #set_service_token('/Users/kefei/Documents/Igenie_Consulting/keys/igenie-project-key.json')
   set_service_token("igenie-project-key.json")
   project <- "igenie-project" 
   #from_date <- as.Date('2017-11-17')
@@ -187,19 +187,19 @@ server <- function(input, output){
   
   
   ####################################### Risk Analysis ###########################################
-  # output$var_chart <- renderPlot({
-     input$submit
-  #   #step1 get the input ready
-  #   maxDate <- input$startdate
-  #   tickers <- input$portfolio
-  #   weights <- as.numeric(input$weights)
-  #   n <- length(tickers)
-  #   var_table <- value_at_risk(maxDate,tickers, weights, n)
-  #   
-  #   ggplot(var_table, aes(x=Type, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge")
-  #   
-  # })
-  # 
+  output$var_chart <- renderPlot({
+    input$submit
+    #step1 get the input ready
+    maxDate <- input$startdate
+    tickers <- input$portfolio
+    weights <- as.numeric(input$weights)
+    n <- length(tickers)
+    var_table <- value_at_risk(maxDate,tickers, weights, n)
+
+    ggplot(var_table, aes(x=Type, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge")
+
+  })
+
   
   ##############################  TWITTER PAGE #######################################
   output$general_twitter_target_price<-renderPlot({
