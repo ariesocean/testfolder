@@ -61,9 +61,18 @@ server <- function(input, output){
    #from_date_temp <- as.integer(as.POSIXct(strptime(from_date,"%Y-%m-%d"))) * 1000
    #to_date_temp <- as.integer(as.POSIXct(strptime(to_date,"%Y-%m-%d"))) * 1000
 
+<<<<<<< HEAD
+  news_data_all <- eventReactive(input$constituent, {
+     sql <- 'SELECT From_date, To_date, constituent,NEWS_TITLE_NewsDim,NEWS_DATE_NewsDim,NEWS_ARTICLE_TXT_NewsDim,categorised_tag,sentiment FROM[igenie-project:pecten_dataset_test.news_all];'
+=======
   news_data_all <- eventReactive(input$reload, {
      sql <- 'SELECT constituent,NEWS_TITLE_NewsDim,NEWS_DATE_NewsDim,NEWS_ARTICLE_TXT_NewsDim,categorised_tag,sentiment FROM[igenie-project:pecten_dataset_test.news_all];'
+>>>>>>> 4e3e485b8f8827e24dca2c41837cd6de3d51e648
      retrieved_data <- query_exec(project=project,  sql, billing = project)
+     retrieved_data$From_date<- strptime(retrieved_data$From_date,format = "%Y-%m-%d")
+     retrieved_data$To_date<-strptime(retrieved_data$To_date,format = "%Y-%m-%d")
+     retrieved_data <- retrieved_data[retrieved_data$From_date==as.Date(from_date) & retrieved_data$To_date==as.Date(to_date),]
+     retrieved_data <- retrieved_data[!is.na(retrieved_data$From_date),]
      news_transform(retrieved_data)
    }, ignoreNULL = FALSE)
    output$news_all <- DT::renderDataTable(news_data_all(),selection = 'single', server=FALSE)
@@ -78,10 +87,7 @@ server <- function(input, output){
                     retrieved_data[i,c('NEWS_ARTICLE_TXT_NewsDim')]
                 ))
                })
-  
-   
-   
-   
+
    
   
   ##For analyst opinions
