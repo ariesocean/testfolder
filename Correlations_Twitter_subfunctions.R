@@ -16,15 +16,15 @@ correlation_twitter<-function(mydata,constituent){
   
   ## Avoids constant data affecting the plot.
   if (length(unique(Twitter_sent))==1){
-    O=0
-    C=0
-    L=0
+     O=0
+     C=0
+     L=0
     H=0}
   
-  if (length(unique(Close)==1)){C=0}
-  if (length(unique(Open)==1)){O=0}
-  if (length(unique(Low)==1)){L=0}
-  if (length(unique(High)==1)){H=0}
+  if (length(unique(Close))<2){C=0}
+  if (length(unique(Open))<2){O=0}
+  if (length(unique(Low))<2){L=0}
+  if (length(unique(High))<2){H=0}
   
   mydata$Date <- as.Date(x = mydata$Date, format = '%d/%m/%Y')
   p <- ggplot(data = mydata, aes(x = Date, group=1))
