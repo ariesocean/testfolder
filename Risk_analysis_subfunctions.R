@@ -4,7 +4,7 @@ library(reshape2)
 library(shiny)
 library(bigrquery)
 
-value_at_risk <- function(maxDate, tickers, weights, n){
+value_at_risk <- function(maxDate, tickers, weights, n, meth){
   set_service_token("igenie-project-key.json")
   #set_service_token("/Users/SparkingAries/Documents/GitHub/testfolder/igenie-project-key.json")
   project <- "igenie-project"
@@ -41,30 +41,55 @@ value_at_risk <- function(maxDate, tickers, weights, n){
   
   
   # calculate the VaR of each assets in our porfolio
-  VaR.Hist <- VaR(port_returns, p=0.95, weights = NULL, portfolio_method = "single", method = "historical")
-  VaR.Gaus <- VaR(port_returns, p=0.95, weights = NULL, portfolio_method = "single", method = "gaussian")
-  VaR.Mod <- VaR(port_returns, p=0.95, weights = NULL, portfolio_method = "single", method = "modified")
+  All.VAR <- VaR(port_returns, p=0.95, weights = NULL, portfolio_method = "single", method = meth)
+  rownames(All.VAR) <- meth
+  # VaR.Hist <- VaR(port_returns, p=0.95, weights = NULL, portfolio_method = "single", method = "historical")
+  # VaR.Gaus <- VaR(port_returns, p=0.95, weights = NULL, portfolio_method = "single", method = "gaussian")
+  # VaR.Mod <- VaR(port_returns, p=0.95, weights = NULL, portfolio_method = "single", method = "modified")
+  #All.VAR <- data.frame(rbind(VaR.Hist, VaR.Gaus, VaR.Mod))
+  #rownames(All.VAR) <- c("Hist", "Gaussian", "Modified")
   
-  All.VAR <- data.frame(rbind(VaR.Hist, VaR.Gaus, VaR.Mod))
-  rownames(All.VAR) <- c("Hist", "Gaussian", "Modified")
+
   
   if (n == 1) {
-    All.VAR <- All.VAR <- abs(All.VAR)
-    All.VAR$Type <- c("Historical", "Gaussian", "Modified")
+    All.VAR <- abs(All.VAR)
+    All.VAR$Type <- meth
+    #All.VAR$Type <- c("Historical", "Gaussian", "Modified")
   } else {
     # calculate the VaR of the porfolio as a whole
-    VaR.Port.Hist <- VaR(port_returns, p=0.95, weights = weights, portfolio_method = "component", method = "historical")
-    VaR.Port.Gaus <- VaR(port_returns, p=0.95, weights = weights, portfolio_method = "component", method = "gaussian")$VaR[1,1]
-    VaR.Port.Mod <- VaR(port_returns, p=0.95, weights = weights, portfolio_method = "component", method = "modified")$MVaR[1,1]
-    
-    All.VAR$Portfolio <- c(VaR.Port.Hist, VaR.Port.Gaus, VaR.Port.Mod)
-    All.VAR <- abs(All.VAR)
-    All.VAR$Type <- c("Historical", "Gaussian", "Modified")
+    if (meth == 'historical'){
+      Portfolio <- VaR(port_returns, p=0.95, weights = weights, portfolio_method = "component", method = meth)
+      All.VAR <- cbind(All.VAR, Portfolio)
+      All.VAR <- abs(All.VAR)
+    } else if (meth == 'gaussian') {
+      Portfolio <- VaR(port_returns, p=0.95, weights = weights, portfolio_method = "component", method = meth)$VaR[1,1]
+      All.VAR <- cbind(All.VAR, Portfolio)
+      All.VAR <- abs(All.VAR)
+    } else 
+      Portfolio <- VaR(port_returns, p=0.95, weights = weights, portfolio_method = "component", method = meth)$MVaR[1,1]
+      All.VAR <- cbind(All.VAR, Portfolio)
+      All.VAR <- abs(All.VAR)
   }
+      
+
+    
+    # All.VAR$Portfolio <- VaR_port
+    # All.VAR <- abs(All.VAR)
+    # All.VAR$Type <- meth
+    
+    # VaR.Port.Hist <- VaR(port_returns, p=0.95, weights = weights, portfolio_method = "component", method = "historical")
+    # VaR.Port.Gaus <- VaR(port_returns, p=0.95, weights = weights, portfolio_method = "component", method = "gaussian")$VaR[1,1]
+    # VaR.Port.Mod <- VaR(port_returns, p=0.95, weights = weights, portfolio_method = "component", method = "modified")$MVaR[1,1]
+    # 
+    # All.VAR$Portfolio <- c(VaR.Port.Hist, VaR.Port.Gaus, VaR.Port.Mod)
+    # All.VAR <- abs(All.VAR)
+    # All.VAR$Type <- c("Historical", "Gaussian", "Modified")
+
   
   #final step plot!
   plotVar <- melt(All.VAR, variable.name = "Assets", value.name = "VaR")
   colnames(plotVar) <- c('Type', 'Assets', 'VaR')
+  
   return(plotVar)
 }
 

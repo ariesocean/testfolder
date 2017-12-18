@@ -5,8 +5,8 @@ account: sparklingocean
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 247941
-bundleId: 1132799
+bundleId: 1141260
 url: https://sparklingocean.shinyapps.io/Dashboard_test/
-when: 1513182541.38978
+when: 1513619278.74906
 asMultiple: FALSE
 asStatic: FALSE
