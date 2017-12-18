@@ -237,28 +237,28 @@ news_annotation_selection<-function(constituent){
   if(constituent=='Daimler'){
     str = 'Only Open has greater than 50% correlations to News sentiment for the time period shown'
   }
-  if(constituent=='Deutsche_Boerse'){
+  if(constituent=='Deutsche Börse'){
     str = 'Only Close prices have greater than 50% correlations to News sentiment for the time period shown'
   }
-  if(constituent=='Deutsche_Bank'){
+  if(constituent=='Deutsche Bank'){
     str = 'All stock prices have less than 50% correlation to News sentiment for the total time period shown.'
   }
-  if(constituent=='Deutsche_Post'){
+  if(constituent=='Deutsche Post'){
     str = 'Only Close prices have greater than 50% correlation to News sentiment for the total time period shown.'
   }
-  if(constituent=='Deutsche_Telekom'){
+  if(constituent=='Deutsche Telekom'){
     str = 'Only High, Close and Low have greater than 50% correlation to News sentiment for the total time period shown.'
   }
   if(constituent=='EON'){
     str ='Only Open and Close prices have greater than 50% correlation to News sentiment for the total time period shown.'
   }
-  if(constituent=='Fresenius_Medical_Care'){
+  if(constituent=='Fresenius Medical Care'){
     str = 'Open Close, High and Lows have greater than 50% correlation to News sentiment for the total time period shown.'
   }
   if(constituent=='Fresenius'){
     str = 'All stock prices have less than 50% correlation to News sentiment for the total time period shown.'
   }
-  if(constituent=='Heidelberg_Cement'){
+  if(constituent=='Heidelberg Cement'){
     str = 'All stock prices have less than 50% correlation to News sentiment for the total time period shown.'
   }
   if(constituent=='Henkel'){
@@ -276,7 +276,7 @@ news_annotation_selection<-function(constituent){
   if(constituent=='Merck'){
     str = 'Only Open and Low prices have greater than 50% correlation to News sentiment for the total time period shown.'
   }
-  if(constituent=='Prosiebensat1_Media'){
+  if(constituent=='Prosiebensat1 Media'){
     str = 'All stock prices have less than 50% correlation to News sentiment for the total time period shown.'
   }
   if(constituent=='RWE'){
