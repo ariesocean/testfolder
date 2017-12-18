@@ -63,7 +63,7 @@ server <- function(input, output){
    #from_date_temp <- as.integer(as.POSIXct(strptime(from_date,"%Y-%m-%d"))) * 1000
    #to_date_temp <- as.integer(as.POSIXct(strptime(to_date,"%Y-%m-%d"))) * 1000
 
-  news_data_all <- eventReactive(input$constituent, {
+  news_data_all <- eventReactive(input$reload, {
      sql <- 'SELECT constituent,NEWS_TITLE_NewsDim,NEWS_DATE_NewsDim,NEWS_ARTICLE_TXT_NewsDim,categorised_tag,sentiment FROM[igenie-project:pecten_dataset_test.news_all];'
      retrieved_data <- query_exec(project=project,  sql, billing = project)
      news_transform(retrieved_data)
@@ -383,10 +383,12 @@ server <- function(input, output){
   sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.all_correlations];'
   correlation_data <- query_exec(project=project,  sql, billing = project)
   #correlation_data$Date<-as.Date(correlation_data$Date)
-  correlation_data$Date<-strptime(correlation_data$Date,format = "%Y-%m-%d")
+  #correlation_data$Date<-strptime(correlation_data$Date,format = "%Y-%m-%d")
   #correlation_data<-na.omit(correlation_data)
-
-  correlation_data<-correlation_data[correlation_data$Date>=as.Date(from_date) & correlation_data$Date<=as.Date(to_date),]
+  correlation_data<-na.omit(correlation_data)
+  #correlation_data$From_date<- strptime(correlation_data$From_date,format = "%Y-%m-%d %H:%M:%S")
+  #correlation_data$To_date<- strptime(correlation_data$To_date,format = "%Y-%m-%d %H:%M:%S")
+  correlation_data<-correlation_data[correlation_data$From_date==as.Date(from_date) & correlation_data$To_date==as.Date(to_date),]
   
   ## News Sentiment line
   output$news_behavior_line <- renderPlotly({
