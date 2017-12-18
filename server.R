@@ -200,11 +200,19 @@ server <- function(input, output){
   # 
   
   ##############################  TWITTER PAGE #######################################
+  output$target_price_error <- renderText({
+    if (constituent =="Adidas"){constituent = 'adidas'}
+    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.target_prices] WHERE constituent ="',constituent,'";',sep='')
+    retrieved_data <- query_exec(project=project,  sql, billing = project)
+    p<-nrow(retrieved_data)
+    p
+    })
+  
   output$general_twitter_target_price<-renderPlot({
+    
     constituent = toString(input$constituent)
     if (constituent =="Adidas"){constituent = 'adidas'}
     ## No new twitter target prices
-    sql <- 'SELECT * FROM[igenie-project:pecten_dataset_test.target_prices];'
     sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.target_prices] WHERE constituent ="',constituent,'";',sep='')
     retrieved_data <- query_exec(project=project,  sql, billing = project)
     retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d" )
@@ -213,6 +221,17 @@ server <- function(input, output){
     retrieved_data<-na.omit(retrieved_data)
     general_target_price_bar(retrieved_data,constituent)
   })
+  
+  
+  output$influencer_price_error <- renderText({
+    if (constituent =="Adidas"){constituent = 'adidas'}
+    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.influencer_prices] WHERE constituent ="',constituent,'";',sep='')
+    retrieved_data <- query_exec(project=project,  sql, billing = project)
+    p<-nrow(retrieved_data)
+    p
+  })
+  
+  
   
   #Deutsche Borse, bmw, henkel, infenion,Volkswagen shows error
   output$influencer_twitter_target_price<-renderPlot({

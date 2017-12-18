@@ -146,6 +146,8 @@ analyst_stacked_bar_2<-function(retrieved_data){
 analyst_stacked_bar_3<-function(retrieved_data){
   df<- retrieved_data[,c('Constituent','Buy_percentage','Hold_percentage','Sell_percentage')]
   df[df$Constituent =='Münchener Rückversicherungs-Gesellschaft',c('Constituent')] ='Münchener RG'
+  df[df$Constituent=='thyssenkrupp',c('Constituent')] = 'Thyssenkrupp'
+  df[df$Constituent=='Volkswagen (VW) vz',c('Constituent')] = 'Volkswagen'
   df<-df[order(df$Constituent),] #Rank by the most. 
   df<-df[21:nrow(df),]
   
@@ -188,8 +190,9 @@ summary_box_3<-function(retrieved_data){
   #df<-df[df$constituent!='Münchener Rückversicherungs-Gesellschaft',]
   #df[df$constituent == 'Münchener Rückversicherungs-Gesellschaft',c('constituent')]='Münchener RG'
   df<-df[21:nrow(df),]
-  df[df$constituent!='thyssenkrupp',c('Constituent')] = 'Thyssenkrupp'
-  df[df$constituent!='Volkswagen (VW) vz',c('Constituent')] = 'Volkswagen'
+  df[df$Constituent=='thyssenkrupp',c('Constituent')] = 'Thyssenkrupp'
+  df[df$Constituent=='Volkswagen (VW) vz',c('Constituent')] = 'Volkswagen'
+  df[df$Constituent =='Münchener Rückversicherungs-Gesellschaft',c('Constituent')] ='Münchener RG'
   datatable(df,options=list(dom='t'),rownames = FALSE,colnames = c('Twitter Sentiment', 'News Sentiment','Profitability', 'Risk')) %>%
     formatStyle(c('Twitter_sent_color','News_sent_color','Profitability_color','Risk_color'),
                 color = styleInterval(c(-1,0),c('red','#FFCC00','#1E8449')),

@@ -14,6 +14,12 @@ correlation_twitter<-function(mydata,constituent){
   L <- cor(Twitter_sent, Low)
   H <- cor(Twitter_sent, High)
   
+  if (length(unique(Twitter_sent))==1){
+    O=0
+    C=0
+    L=0
+    H=0}
+  
   mydata$Date <- as.Date(x = mydata$Date, format = '%d/%m/%Y')
   p <- ggplot(data = mydata, aes(x = Date, group=1))
   p<-p + labs(title = title_str)

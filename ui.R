@@ -271,13 +271,14 @@ ui <- dashboardPage(
       
       ############################ TWITTER PAGE ####################################
       tabItem(tabName = 'twitter_analysis',
+              
               fluidRow(
-                # tabBox(title=h4("Twitter Target Price"), height=500,side='right',
-                #        tabPanel('General',
-                #                 plotOutput("general_twitter_target_price", height=420)),
-                #        
-                #        tabPanel('Influencer',
-                #                 plotOutput("influencer_twitter_target_price", height=420))),
+                 tabBox(title=h4("Twitter Target Price"), height=500,side='right',
+                        tabPanel('General',
+                                 plotOutput("general_twitter_target_price", height=420)),
+                        
+                        tabPanel('Influencer',
+                                 plotOutput("influencer_twitter_target_price", height=420))),
                 
                  tabBox(title = h4('Twitter Analysis by Countries'),
                         height=500,side='right',
