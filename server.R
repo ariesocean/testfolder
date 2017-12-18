@@ -26,12 +26,10 @@ library(RColorBrewer)
 library(plotly)
 library(treemap)
 
-
-
 server <- function(input, output){
   
   #set_service_token("/Users/SparkingAries/Documents/GitHub/testfolder/igenie-project-key.json")
-  set_service_token('/Users/kefei/Documents/Igenie_Consulting/keys/igenie-project-key.json')
+  #set_service_token('/Users/kefei/Documents/Igenie_Consulting/keys/igenie-project-key.json')
   set_service_token("igenie-project-key.json")
   project <- "igenie-project" 
   #from_date <- as.Date('2017-11-17')
@@ -187,15 +185,15 @@ server <- function(input, output){
   ####################################### Risk Analysis ###########################################
   output$var_chart <- renderPlot({
   #   #step1 get the input ready
-    input$submit
+    #input$submit
      maxDate <- input$startdate
      tickers <- input$portfolio
      weights <- as.numeric(input$weights)
      n <- length(tickers)
-     var_table <- value_at_risk(maxDate,tickers, weights, n)
+     meth <- input$meth
+     var_table <- value_at_risk(maxDate,tickers, weights, n, meth)
      
-     ggplot(var_table, aes(x=Type, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge")
-     
+     ggplot(var_table, aes(x=Type, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge") #+ scale_fill_manual(values = "Grey50", limits = 4)
    })
   # 
   
@@ -218,7 +216,12 @@ server <- function(input, output){
     retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d" )
     retrieved_data$to_date<-strptime(retrieved_data$to_date,format = "%Y-%m-%d")
     retrieved_data<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
-    retrieved_data<-na.omit(retrieved_data)
+    #retrieved_data<-na.omit(retrieved_data)
+    nrows <- nrow(retrieved_data)
+    if (nrows == 0){
+      retrieved_data <- query_exec(project=project,  sql, billing = project)
+      retrieved_data<-na.omit(retrieved_data)
+    }
     general_target_price_bar(retrieved_data,constituent)
   })
   
@@ -243,6 +246,11 @@ server <- function(input, output){
     retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d" )
     retrieved_data$to_date<-strptime(retrieved_data$to_date,format = "%Y-%m-%d")
     retrieved_data<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
+    nrows <- nrow(retrieved_data)
+    if (nrows == 0){
+      retrieved_data <- query_exec(project=project,  sql, billing = project)
+      retrieved_data<-na.omit(retrieved_data)
+    }
     influencer_target_price_bar(retrieved_data,constituent)
   })
   
@@ -281,6 +289,15 @@ server <- function(input, output){
   })
   
   ##Frequency Mapping
+  ##dummy
+  
+  # constituent = 'adidas'
+  #   'adidas', 'Allianz', 'BASF', 'BMW', 'Bayer', 'Beiersdorf',
+  # 'Commerzbank', 'Continental', 'Daimler',
+  # 'Deutsche Bank', 'Deutsche Post',
+  # 'Deutsche Telekom', 'EON', 'Fresenius',
+  # 'Fresenius Medical Care'
+  
   output$popularity_map<-renderPlot({
      constituent = toString(input$constituent)
      sql <-paste('SELECT count,avg_sentiment,country_name,constituent,from_date,to_date FROM[igenie-project:pecten_dataset_test.country_data] WHERE constituent="',constituent,'";', sep='')
@@ -289,7 +306,7 @@ server <- function(input, output){
      retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d" )
      retrieved_data$to_date<-strptime(retrieved_data$to_date,format = "%Y-%m-%d")
      retrieved_data<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
-     map_frequency(retrieved_data,constituent)
+     map_frequency(retrieved_data, constituent)
   })
   
   
