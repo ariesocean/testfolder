@@ -6,7 +6,7 @@ library(bigrquery)
 
 value_at_risk <- function(maxDate, tickers, weights, n, meth){
   set_service_token("igenie-project-key.json")
-  #set_service_token("/Users/SparkingAries/Documents/GitHub/testfolder/igenie-project-key.json")
+  #set_service_token("/Users/SparkingAries/OneDrive/Data_Science/iGenie Counsulting/igenie-project-key.json")
   project <- "igenie-project"
   port_prices <- data.frame()
   
@@ -39,39 +39,34 @@ value_at_risk <- function(maxDate, tickers, weights, n, meth){
   #rename the column names
   colnames(port_returns) <- tickers
   
-  
+  as.data.frame()
   # calculate the VaR of each assets in our porfolio
-  All.VAR <- VaR(port_returns, p=0.95, weights = NULL, portfolio_method = "single", method = meth)
-  rownames(All.VAR) <- meth
+  All.VAR <- as.data.frame(VaR(port_returns, p=0.95, weights = NULL, portfolio_method = "single", method = meth))
   # VaR.Hist <- VaR(port_returns, p=0.95, weights = NULL, portfolio_method = "single", method = "historical")
   # VaR.Gaus <- VaR(port_returns, p=0.95, weights = NULL, portfolio_method = "single", method = "gaussian")
   # VaR.Mod <- VaR(port_returns, p=0.95, weights = NULL, portfolio_method = "single", method = "modified")
   #All.VAR <- data.frame(rbind(VaR.Hist, VaR.Gaus, VaR.Mod))
   #rownames(All.VAR) <- c("Hist", "Gaussian", "Modified")
   
-
-  
   if (n == 1) {
     All.VAR <- abs(All.VAR)
-    All.VAR$Type <- meth
     #All.VAR$Type <- c("Historical", "Gaussian", "Modified")
   } else {
     # calculate the VaR of the porfolio as a whole
     if (meth == 'historical'){
       Portfolio <- VaR(port_returns, p=0.95, weights = weights, portfolio_method = "component", method = meth)
       All.VAR <- cbind(All.VAR, Portfolio)
-      All.VAR <- abs(All.VAR)
     } else if (meth == 'gaussian') {
       Portfolio <- VaR(port_returns, p=0.95, weights = weights, portfolio_method = "component", method = meth)$VaR[1,1]
       All.VAR <- cbind(All.VAR, Portfolio)
-      All.VAR <- abs(All.VAR)
     } else 
       Portfolio <- VaR(port_returns, p=0.95, weights = weights, portfolio_method = "component", method = meth)$MVaR[1,1]
       All.VAR <- cbind(All.VAR, Portfolio)
-      All.VAR <- abs(All.VAR)
   }
-      
-
+  All.VAR <- All.VAR[, !duplicated(colnames(All.VAR))]
+  rownames(All.VAR) <- meth
+  All.VAR <- abs(All.VAR)
+  All.VAR$Type <- meth
     
     # All.VAR$Portfolio <- VaR_port
     # All.VAR <- abs(All.VAR)
@@ -89,6 +84,7 @@ value_at_risk <- function(maxDate, tickers, weights, n, meth){
   #final step plot!
   plotVar <- melt(All.VAR, variable.name = "Assets", value.name = "VaR")
   colnames(plotVar) <- c('Type', 'Assets', 'VaR')
+  ggplot(plotVar, aes(x=Type, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge") #+ scale_fill_manual(values = "Grey50", limits = 4)
   
   return(plotVar)
 }
