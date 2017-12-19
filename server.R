@@ -202,8 +202,8 @@ server <- function(input, output){
      meth <- input$meth
      var_table <- value_at_risk(maxDate,tickers, weights, n, meth)
      
-     ggplot(var_table, aes(x=Type, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge") #+ scale_fill_manual(values = "Grey50", limits = 4)
-   })
+     ggplot(var_table, aes(x=Assets, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge") #+ scale_fill_manual(values = "Grey50", limits = 4)
+  })
   # 
   
   ##############################  TWITTER PAGE #######################################

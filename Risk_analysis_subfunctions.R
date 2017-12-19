@@ -65,7 +65,7 @@ value_at_risk <- function(maxDate, tickers, weights, n, meth){
   All.VAR <- All.VAR[, !duplicated(colnames(All.VAR))]
   rownames(All.VAR) <- meth
   All.VAR <- abs(All.VAR)
-  All.VAR$Type <- meth
+  #All.VAR$Type <- meth
     
     # All.VAR$Portfolio <- VaR_port
     # All.VAR <- abs(All.VAR)
@@ -82,10 +82,9 @@ value_at_risk <- function(maxDate, tickers, weights, n, meth){
   
   #final step plot!
   plotVar <- melt(All.VAR, variable.name = "Assets", value.name = "VaR")
-  colnames(plotVar) <- c('Type', 'Assets', 'VaR')
-  ggplot(plotVar, aes(x=Type, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge") #+ scale_fill_manual(values = "Grey50", limits = 4)
-  ggplot(All.VAR, aes(x=meth, y=VaR, fill=meth)) + geom_bar(stat = "identity", position = "dodge") #+ scale_fill_manual(values = "Grey50", limits = 4)
-  
+  colnames(plotVar) <- c('Assets', 'VaR')
+  #ggplot(plotVar, aes(x=Assets, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge") #+ scale_fill_manual(values = "Grey50", limits = 4)
+
   return(plotVar)
 }
 
