@@ -287,25 +287,25 @@ twitter_annotation_selection<-function(constituent){
   if(constituent=='Daimler'){
     str = 'Only Open prices have greater than 50% correlation to Twitter sentiment for the total time period shown'
   }
-  if(constituent=='Deutsche_Boerse'){
+  if(constituent=='Deutsche Börse'){
     str = 'Only Close prices have greater than 50% correlation to Twitter sentiment for the total time period shown'
   }
-  if(constituent=='Deutsche_Bank'){
+  if(constituent=='Deutsche Bank'){
     str = 'All stock prices have less than 50% correlation to Twitter sentiment for the total time period shown'
   }
-  if(constituent=='Deutsche_Telekom'){
+  if(constituent=='Deutsche Telekom'){
     str = 'All stock prices have less than 50% correlation to Twitter sentiment for the total time period shown'
   }
   if(constituent=='EON'){
     str = 'All stock prices have less than 50% correlation to Twitter sentiment for the total time period shown'
   }
-  if(constituent=='Fresenius_Medical_Care'){
+  if(constituent=='Fresenius Medical Care'){
     str = 'All stock prices have less than 50% correlation to Twitter sentiment for the total time period shown'
   }
   if(constituent=='Fresenius'){
     str = 'All stock prices have less than 50% correlation to Twitter sentiment for the total time period shown'
   }
-  if(constituent=='Heidelberg_Cement'){
+  if(constituent=='Heidelberg Cement'){
     str = 'All stock prices have less than 50% correlation to Twitter sentiment for the total time period shown'
   }
   if(constituent=='Henkel'){
@@ -323,7 +323,7 @@ twitter_annotation_selection<-function(constituent){
   if(constituent=='Merck'){
     str = 'All stock prices have less than 50% correlation to Twitter sentiment for the total time period shown'
   }
-  if(constituent=='Prosiebensat1_Media'){
+  if(constituent=='Prosiebensat1 Media'){
     str = 'All stock prices have less than 50% correlation to Twitter sentiment for the total time period shown'
   }
   if(constituent=='RWE'){
@@ -347,7 +347,7 @@ twitter_annotation_selection<-function(constituent){
   if(constituent=='Continental'){
     str = 'Only Open, Highs and Close have greater than 50% correlations to Twitter sentiment for the time period shown'
   }
-  if(constituent=='Deutsche_Post'){
+  if(constituent=='Deutsche Post'){
     str = 'All stock prices have less than 50% correlation to Twitter sentiment for the total time period shown'
   }
   str

@@ -61,18 +61,18 @@ server <- function(input, output){
    #from_date_temp <- as.integer(as.POSIXct(strptime(from_date,"%Y-%m-%d"))) * 1000
    #to_date_temp <- as.integer(as.POSIXct(strptime(to_date,"%Y-%m-%d"))) * 1000
 
+  sql <- 'SELECT From_date, To_date, constituent,NEWS_TITLE_NewsDim,NEWS_DATE_NewsDim,NEWS_ARTICLE_TXT_NewsDim,categorised_tag,sentiment FROM[igenie-project:pecten_dataset_test.news_all];'
+  news_all_data <- query_exec(project=project,  sql, billing = project)
+  news_all_data$From_date<- strptime(news_all_data$From_date,format = "%Y-%m-%d")
+  news_all_data$To_date<-strptime(news_all_data$To_date,format = "%Y-%m-%d")
+  news_all_data <- news_all_data[news_all_data$From_date==as.Date(from_date) & news_all_data$To_date==as.Date(to_date),]
+  news_all_data <- news_all_data[!is.na(news_all_data$From_date),]
 
+  
   news_data_all <- eventReactive(input$reload, {
-     sql <- 'SELECT From_date, To_date, constituent,NEWS_TITLE_NewsDim,NEWS_DATE_NewsDim,NEWS_ARTICLE_TXT_NewsDim,categorised_tag,sentiment FROM[igenie-project:pecten_dataset_test.news_all];'
-     retrieved_data <- query_exec(project=project,  sql, billing = project)
-     retrieved_data$From_date<- strptime(retrieved_data$From_date,format = "%Y-%m-%d")
-     retrieved_data$To_date<-strptime(retrieved_data$To_date,format = "%Y-%m-%d")
-     retrieved_data <- retrieved_data[retrieved_data$From_date==as.Date(from_date) & retrieved_data$To_date==as.Date(to_date),]
-     retrieved_data <- retrieved_data[!is.na(retrieved_data$From_date),]
-     
      ##Sort by alphabetic order of constituents
-     retrieved_data <- retrieved_data[order(retrieved_data$constituent),]
-     news_transform(retrieved_data)
+    news_all_data <- news_all_data[order(news_all_data$constituent),]
+     news_transform(news_all_data)
    }, ignoreNULL = FALSE)
    output$news_all <- DT::renderDataTable(news_data_all(),selection = 'single', server=FALSE)
    
@@ -81,7 +81,7 @@ server <- function(input, output){
                   i = input$news_all_rows_selected
                   cat(i)
                   i <- i[length(i)]
-                  retrieved_data <- retrieved_data[order(retrieved_data$constituent),]
+                  retrieved_data <- news_all_data[order(news_all_data$constituent),]
                   showModal(modalDialog(
                     
                     title = toString(retrieved_data[i,c('NEWS_TITLE_NewsDim')]),
@@ -299,7 +299,6 @@ server <- function(input, output){
      df<-retrieved_data
     }
     
-    
     map_sentiment(df,constituent)
   })
   
@@ -345,11 +344,15 @@ server <- function(input, output){
   ##News Tagging Count - Multicolored Vertical Bar Chart
   output$news_tag_bar<-renderPlot({
     constituent <-toString(input$constituent)
-    sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.news_tag] WHERE constituent="',constituent,'";', sep='')
+    if (constituent == 'Adidas'){constituent = "adidas"}
+    sql <- paste('SELECT From_date,To_date,Tags,Count FROM[igenie-project:pecten_dataset_test.news_tag] WHERE constituent="',constituent,'";', sep='')
     retrieved_data <- query_exec(project=project,  sql, billing = project)
-    retrieved_data$Date <-as.Date(retrieved_data$Date)
+    #retrieved_data$Date <-as.Date(retrieved_data$Date)
     retrieved_data<-retrieved_data[retrieved_data$Tags!='None',]
-    retrieved_data <-retrieved_data[retrieved_data$Date >= as.Date(from_date) & retrieved_data$Date<=as.Date(to_date) ,]
+    retrieved_data$To_date<-strptime(retrieved_data$To_date,format = "%Y-%m-%d")
+    retrieved_data$From_date<-strptime(retrieved_data$From_date,format = "%Y-%m-%d")
+    retrieved_data <-retrieved_data[retrieved_data$From_date == as.Date(from_date) & retrieved_data$To_date==as.Date(to_date) ,]
+    retrieved_data<-na.omit(retrieved_data)
     count_tags_bar(retrieved_data ,constituent)
   })
   
@@ -379,16 +382,16 @@ server <- function(input, output){
   })
   
   
+  #sql <- 'SELECT NEWS_DATE_NewsDim,constituent,categorised_tag,NEWS_TITLE_NewsDim, NEWS_ARTICLE_TXT_NewsDim FROM[igenie-project:pecten_dataset_test.news_analytics_topic_articles];'
+  sql<- paste("SELECT From_Date,To_Date, NEWS_DATE_NewsDim,constituent,categorised_tag,News_Title_NewsDim, NEWS_ARTICLE_TXT_NewsDim FROM[igenie-project:pecten_dataset_test.news_analytics_topic_articles] WHERE From_Date =TIMESTAMP('", from_date, " UTC') AND To_Date = TIMESTAMP('", to_date, " UTC') ;",sep='')
+  news_article_data <- query_exec(project=project,  sql, billing = project)
+  news_article_data <-news_article_data[!is.na(news_article_data$From_Date),]
+  
    news_analytics_topic_articles_all <- eventReactive(input$constituent, {
      constituent = toString(input$constituent)
      if (constituent == 'Adidas'){constituent = "adidas"}
      if (constituent == 'Thyssenkrupp'){constituent = "thyssenkrupp"}
-     #sql <- 'SELECT NEWS_DATE_NewsDim,constituent,categorised_tag,NEWS_TITLE_NewsDim, NEWS_ARTICLE_TXT_NewsDim FROM[igenie-project:pecten_dataset_test.news_analytics_topic_articles];'
-     sql<- paste("SELECT From_Date,To_Date, NEWS_DATE_NewsDim,constituent,categorised_tag,News_Title_NewsDim, NEWS_ARTICLE_TXT_NewsDim FROM[igenie-project:pecten_dataset_test.news_analytics_topic_articles] WHERE From_Date =TIMESTAMP('", from_date, " UTC') AND To_Date = TIMESTAMP('", to_date, " UTC') ;",sep='')
-    
-     retrieved_data <- query_exec(project=project,  sql, billing = project)
-     retrieved_data <-retrieved_data[!is.na(retrieved_data$From_Date),]
-     df<- retrieved_data[retrieved_data$constituent == constituent,]
+     df<- news_article_data[news_article_data$constituent == constituent,]
      news_analytics_topic_articles_func(df,constituent)
    }, ignoreNULL = FALSE)
    
@@ -401,15 +404,14 @@ server <- function(input, output){
                   cat(i)
                   i <- i[length(i)]
                   
-                 
-                  #if (constituent == 'Adidas'){constituent = "adidas"}
-                  #if (constituent == 'Thyssenkrupp'){constituent = "thyssenkrupp"}
-                  #db<-retrieved_data[retrieved_data$constituent == constituent,]
+                  constituent = toString(input$constituent)
+                  if (constituent == 'Adidas'){constituent = "adidas"}
+                  if (constituent == 'Thyssenkrupp'){constituent = "thyssenkrupp"}
+                  db<-news_article_data[news_article_data$constituent== constituent,]
                   showModal(modalDialog(
                     #title = constituent 
-                    title = toString(df[i,c('News_Title_NewsDim')])
-                    
-                    #toString(df[i,c('NEWS_ARTICLE_TXT_NewsDim')])
+                    title = toString(db[i,c('News_Title_NewsDim')]),
+                    toString(db[i,c('NEWS_ARTICLE_TXT_NewsDim')])
                     #df[i,]
                   ))
                 })
