@@ -289,27 +289,38 @@ ui <- dashboardPage(
                         tabPanel('Influencer',
                                  plotOutput("influencer_twitter_target_price", height=420))),
                 
-                 tabBox(title = h4('Twitter Analysis by Countries'),
-                        height=500,side='right',
+                 tabBox(title='Recent Tweets',side = 'right',
+                      tabPanel('Target Prices',
+                        DT::dataTableOutput('recent_tweets_table'),
+                        height=500)
+                  )
+              ),
+                 
+                 
+
+              fluidRow(  
+                 tabBox(title=h4('Twitter Sentiment Count'),height=500, side = 'right',
+                    tabPanel("All Tweets",
+                     #align='center',
+                     plotOutput('tweet_num',height=400),
+                     height=450)),
+                 
+                 tabBox(title = h4('Twitter Analysis by Countries'), side = 'right',
+                        height=500,
                         tabPanel('Sentiment',
                                  plotOutput('sentiment_map',height=400)),
                         tabPanel('Frequency',
                                  plotOutput('popularity_map',height=400))
-                        )),
-                 
-              
-              fluidRow(  
-                 box(title='Twitter Sentiment Count',
-                     align='center',
-                     plotOutput('tweet_num',height=400),
-                     height=500),
+                 ))
                 
-                box(title='Recent Tweets',
-                    align='center',
-                    DT::dataTableOutput('recent_tweets_table'),
-                    height=500))
+                # box(title='Recent Tweets',
+                #     align='center',
+                #     DT::dataTableOutput('recent_tweets_table'),
+                #     height=500))
+      
+          )
       )
     )
   )
-)
+
 
