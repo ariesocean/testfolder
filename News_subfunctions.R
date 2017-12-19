@@ -43,17 +43,16 @@ daily_news_sent<-function(df,constituent){
 
 ## News Box
 news_analytics_topic_articles_func <-function(db,constituent){
-  #db$NEWS_DATE_NewsDim<- as.Date(db$NEWS_DATE_NewsDim,format='%d/%m/%Y')
-  db<- db[order(-as.numeric(db$NEWS_DATE_NewsDim)),] ##order by release dates, descending
-  num_news<-nrow(db)
-  db <- db[1:num_news,c('NEWS_TITLE_NewsDim','constituent','categorised_tag')]
+  #db$NEWS_DATE_NewsDim<- as.Date(db$NEWS_DATE_NewsDim,format='%Y-%m-%d')
+  #db<- db[order(-as.numeric(db$NEWS_DATE_NewsDim)),] ##order by release dates, descending
+  db <- db[,c('News_Title_NewsDim','constituent','categorised_tag')]
   
   #make sure the news link only contains 8 characters from the headline. 
-  db$NEWS_TITLE_NewsDim <- as.character(db$NEWS_TITLE_NewsDim)
-  db$NEWS_TITLE_NewsDim <- unlist(lapply(db$NEWS_TITLE_NewsDim, string_fun)) ##Apply the limit
+  db$News_Title_NewsDim <- as.character(db$News_Title_NewsDim)
+  db$News_Title_NewsDim <- unlist(lapply(db$News_Title_NewsDim, string_fun)) ##Apply the limit
   ##remove the NA
-  db$NEWS_TITLE_NewsDim <-gsub("NA", " ", db$NEWS_TITLE_NewsDim)
-  df<- datatable(db[,c('NEWS_TITLE_NewsDim','categorised_tag')],rownames=FALSE, options = list(pageLength = 5),colnames = c('Headline' ,'Topic'),escape=FALSE)
+  db$News_Title_NewsDim <-gsub("NA", " ", db$News_Title_NewsDim)
+  df<- datatable(db[,c('News_Title_NewsDim','categorised_tag')],rownames=FALSE, options = list(pageLength = 5),colnames = c('Headline' ,'Topic'),escape=FALSE)
 }
 
 
