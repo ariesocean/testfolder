@@ -84,7 +84,7 @@ correlation_news<-function(mydata,constituent){
   }
   
   
-  if(constituent=='Deutsche Borse'){
+  if(constituent=='Deutsche Börse'){
     p <- p + geom_line(aes(y = News_sent*297, colour = "News Sentiment"))
     p <- p + theme(axis.title.y=element_blank(), legend.position = c(0.15, 0.850))
   }
