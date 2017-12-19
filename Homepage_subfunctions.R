@@ -72,7 +72,7 @@ popular_constituents_bar<-function(top_tweeted_constituents){
 
 ## This is a function that only extract the first n words of a string object. 
 string_fun <- function(x) {
-  ul = unlist(strsplit(x, split = "\\s+"))[1:10] #set n=8
+  ul = unlist(strsplit(x, split = "\\s+"))[1:8] #set n=8
   paste(ul,collapse=" ")
 }
 
