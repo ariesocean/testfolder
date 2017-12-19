@@ -39,7 +39,6 @@ value_at_risk <- function(maxDate, tickers, weights, n, meth){
   #rename the column names
   colnames(port_returns) <- tickers
   
-  as.data.frame()
   # calculate the VaR of each assets in our porfolio
   All.VAR <- as.data.frame(VaR(port_returns, p=0.95, weights = NULL, portfolio_method = "single", method = meth))
   # VaR.Hist <- VaR(port_returns, p=0.95, weights = NULL, portfolio_method = "single", method = "historical")
@@ -85,6 +84,7 @@ value_at_risk <- function(maxDate, tickers, weights, n, meth){
   plotVar <- melt(All.VAR, variable.name = "Assets", value.name = "VaR")
   colnames(plotVar) <- c('Type', 'Assets', 'VaR')
   ggplot(plotVar, aes(x=Type, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge") #+ scale_fill_manual(values = "Grey50", limits = 4)
+  ggplot(All.VAR, aes(x=meth, y=VaR, fill=meth)) + geom_bar(stat = "identity", position = "dodge") #+ scale_fill_manual(values = "Grey50", limits = 4)
   
   return(plotVar)
 }
