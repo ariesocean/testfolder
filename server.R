@@ -61,13 +61,16 @@ server <- function(input, output){
    #from_date_temp <- as.integer(as.POSIXct(strptime(from_date,"%Y-%m-%d"))) * 1000
    #to_date_temp <- as.integer(as.POSIXct(strptime(to_date,"%Y-%m-%d"))) * 1000
 
-  news_data_all <- eventReactive(input$constituent, {
+  news_data_all <- eventReactive(input$reload, {
      sql <- 'SELECT From_date, To_date, constituent,NEWS_TITLE_NewsDim,NEWS_DATE_NewsDim,NEWS_ARTICLE_TXT_NewsDim,categorised_tag,sentiment FROM[igenie-project:pecten_dataset_test.news_all];'
      retrieved_data <- query_exec(project=project,  sql, billing = project)
      retrieved_data$From_date<- strptime(retrieved_data$From_date,format = "%Y-%m-%d")
      retrieved_data$To_date<-strptime(retrieved_data$To_date,format = "%Y-%m-%d")
      retrieved_data <- retrieved_data[retrieved_data$From_date==as.Date(from_date) & retrieved_data$To_date==as.Date(to_date),]
      retrieved_data <- retrieved_data[!is.na(retrieved_data$From_date),]
+     
+     ##Sort by alphabetic order of constituents
+     retrieved_data <- retrieved_data[order(retrieved_data$constituent),]
      news_transform(retrieved_data)
    }, ignoreNULL = FALSE)
    output$news_all <- DT::renderDataTable(news_data_all(),selection = 'single', server=FALSE)
@@ -77,11 +80,16 @@ server <- function(input, output){
                   i = input$news_all_rows_selected
                   cat(i)
                   i <- i[length(i)]
+                  retrieved_data <- retrieved_data[order(retrieved_data$constituent),]
                   showModal(modalDialog(
-                    title = retrieved_data[i,c('NEWS_TITLE_NewsDim')],
-                    retrieved_data[i,c('NEWS_ARTICLE_TXT_NewsDim')]
+                    
+                    title = toString(retrieved_data[i,c('NEWS_TITLE_NewsDim')]),
+                    #title = toString(retrieved_data[i,c('constituent')]),
+                    toString(retrieved_data[i,c('NEWS_ARTICLE_TXT_NewsDim')])
                 ))
                })
+
+   
 
    
   
@@ -280,33 +288,34 @@ server <- function(input, output){
     if (constituent =="Adidas"){constituent = 'adidas'}
     sql <- paste('SELECT count,avg_sentiment,country_name,constituent,from_date,to_date FROM[igenie-project:pecten_dataset_test.country_data] WHERE constituent ="',constituent,'";', sep='')
     retrieved_data <- query_exec(project=project,  sql, billing = project)
-    retrieved_data<-na.omit(retrieved_data)
+    
     #retrieved_data$date_of_analysis<-strptime(retrieved_data$date_of_analysis,format = "%Y-%m-%d")
     retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d" )
     retrieved_data$to_date<-strptime(retrieved_data$to_date,format = "%Y-%m-%d")
-    retrieved_data<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
-    #retrieved_data<-retrieved_data[retrieved_data$date_of_analysis >=as.Date(from_date) & retrieved_data$date_of_analysis<=as.Date(to_date) ,]
-    map_sentiment(retrieved_data,constituent)
+    #Select the data according to the date range
+    df<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
+    df<-na.omit(df)
+    nrows <- nrow(df)
+    if (nrows <2){
+     df<-retrieved_data
+    }
+    map_sentiment(df,constituent)
   })
   
   ##Frequency Mapping
-  ##dummy
-  
-  # constituent = 'adidas'
-  #   'adidas', 'Allianz', 'BASF', 'BMW', 'Bayer', 'Beiersdorf',
-  # 'Commerzbank', 'Continental', 'Daimler',
-  # 'Deutsche Bank', 'Deutsche Post',
-  # 'Deutsche Telekom', 'EON', 'Fresenius',
-  # 'Fresenius Medical Care'
-  
   output$popularity_map<-renderPlot({
      constituent = toString(input$constituent)
      sql <-paste('SELECT count,avg_sentiment,country_name,constituent,from_date,to_date FROM[igenie-project:pecten_dataset_test.country_data] WHERE constituent="',constituent,'";', sep='')
      retrieved_data <- query_exec(project=project,  sql, billing = project)
-     retrieved_data<-na.omit(retrieved_data)
      retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d" )
      retrieved_data$to_date<-strptime(retrieved_data$to_date,format = "%Y-%m-%d")
-     retrieved_data<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
+     #select the data according to the date range
+     df<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
+     df<-na.omit(df)
+     nrows <- nrow(df)
+     if (nrows <2 ){
+       df<-retrieved_data
+     }
      map_frequency(retrieved_data, constituent)
   })
   
