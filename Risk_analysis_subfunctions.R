@@ -49,7 +49,7 @@ value_at_risk <- function(maxDate, tickers, weights, n, meth){
   #All.VAR <- data.frame(rbind(VaR.Hist, VaR.Gaus, VaR.Mod))
   #rownames(All.VAR) <- c("Hist", "Gaussian", "Modified")
   
-
+  
   
   if (n == 1) {
     All.VAR <- abs(All.VAR)
@@ -62,7 +62,7 @@ value_at_risk <- function(maxDate, tickers, weights, n, meth){
       All.VAR <- cbind(All.VAR, Portfolio)
       All.VAR <- abs(All.VAR)
     } else if (meth == 'gaussian') {
-      Portfolio <- VaR(port_returns, p=0.95, weights = weights, portfolio_method = "component", method = meth)$VaR[1,1]
+      Portfolio <- as.numeric(VaR(port_returns, p=0.95, weights = weights, portfolio_method = "component", method = meth)$VaR[1,1])
       All.VAR <- cbind(All.VAR, Portfolio)
       All.VAR <- abs(All.VAR)
     } else 

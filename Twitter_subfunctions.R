@@ -129,11 +129,16 @@ map_sentiment<-function(country_df,constituent){
   if ((min_sent<=0)&(max_sent>=0)){palette_color = c('red','#EB984E','#FFCC00','#1E8449')}
   if ((min_sent<=0)&(max_sent<=0)){palette_color = c('red','#EB984E','#FFCC00')}
   if ((min_sent>=0)&(max_sent>=0)){palette_color = c('#FFCC00','#1E8449')}
+  if (nrow(df)==1){
+    if(df$avg_sentiment>0){palette_color = c('#1E8449')}
+    if(df$avg_sentiment<0){palette_color =c('red') }
+  }
   
   n <- joinCountryData2Map(df, joinCode="ISO2", nameJoinColumn="country_name")
   par(mar=c(0,0,0,0))
   mapCountryData(n, nameColumnToPlot="avg_sentiment", mapTitle='',colourPalette=rwmGetColours(palette_color,length(palette_color)))
-}
+  mapCountryData(n, nameColumnToPlot="avg_sentiment", mapTitle='',colour= 'red')
+  }
 
 
 recent_tweets<-function(df){

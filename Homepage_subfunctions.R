@@ -72,15 +72,15 @@ popular_constituents_bar<-function(top_tweeted_constituents){
 
 ## This is a function that only extract the first n words of a string object. 
 string_fun <- function(x) {
-  ul = unlist(strsplit(x, split = "\\s+"))[1:10] #set n=8
+  ul = unlist(strsplit(x, split = "\\s+"))[1:8] #set n=8
   paste(ul,collapse=" ")
 }
 
 
 ##This function transforms the all_news database into a presentable DataTable
 news_transform<-function(db){
-  db$NEWS_DATE_NewsDim<- as.Date(db$NEWS_DATE_NewsDim,format='%d/%m/%Y')
-  db<- db[order(-as.numeric(db$NEWS_DATE_NewsDim)),] ##order by release dates, descending
+  #db$NEWS_DATE_NewsDim<- as.Date(db$NEWS_DATE_NewsDim,format='%d/%m/%Y')
+  #db<- db[order(-as.numeric(db$NEWS_DATE_NewsDim)),] ##order by release dates, descending
   
   #db <- db[1:30,]
   #make sure the news link only contains 8 characters from the headline. 
@@ -101,8 +101,8 @@ news_transform<-function(db){
   ##Fix the capital letters
   #db$Newslink<-paste('<a href="',db$Link,'">',db$Headline ,'</a>',sep="") #embed the hyperlink in headlines
   
-  #db[db['constituent']=='adidas',c('constituent')]<-'Adidas'
-  df<- datatable(db[,c('NEWS_TITLE_NewsDim','constituent','sentiment')],rownames=FALSE, options = list(pageLength = 5),colnames = c('Headline' ,'Constituent','Sentiment'),escape=FALSE) %>%
+  db[db['constituent']=='adidas',c('constituent')]<-'Adidas'
+  df<- datatable(db[order(db$constituent),c('NEWS_TITLE_NewsDim','constituent','sentiment')],rownames=FALSE, options = list(pageLength = 5),colnames = c('Headline' ,'Constituent','Sentiment'),escape=FALSE) %>%
     formatStyle('sentiment',
                 color = styleInterval(c(-1,0),c('red','#FFCC00','#1E8449')),
                 backgroundColor = styleInterval(c(-1,0),c('red','#FFCC00','#1E8449')))
