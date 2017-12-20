@@ -353,6 +353,7 @@ server <- function(input, output){
     retrieved_data$From_date<-strptime(retrieved_data$From_date,format = "%Y-%m-%d")
     retrieved_data <-retrieved_data[retrieved_data$From_date == as.Date(from_date) & retrieved_data$To_date==as.Date(to_date) ,]
     retrieved_data<-na.omit(retrieved_data)
+    if (constituent == 'adidas'){constituent = "Adidas"}
     count_tags_bar(retrieved_data ,constituent)
   })
   
