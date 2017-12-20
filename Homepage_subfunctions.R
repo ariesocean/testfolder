@@ -35,14 +35,17 @@ popular_tweet_treemap<-function(df){
   
   treemap(df,index="label",vSize="count",
           vColor = "avg_sentiment_all",
+          #vColor = "count",
           type='manual',
           palette="RdYlGn", 
+          #palette = sent_colors,
           algorithm = 'squarified',
-          mapping=c(-0.15, 0, 0.15),
+          mapping=c(-0.25, 0, 0.25),
+          #mapping=c(-1, 0, 1),
           fontsize.labels=c(10,10),
           title="Most Tweeted Consistuent Count vs. Sentiment - Last 2 Months",
           fontsize.title = c(14),
-          fontface.labels=c(1,1),
+          fontface.labels=c(0,0),
           #bg.labels=c("transparent"), 
           border.col=c("white","white"), 
           border.lwds=c(7,2),
@@ -50,10 +53,11 @@ popular_tweet_treemap<-function(df){
             c("center", "center"), 
             c("right", "bottom")
           ),      
-          title.legend="Average sentiment",
+          #title.legend="Average sentiment",
           overlap.labels=0.5,
           inflate.labels=F
-  )}
+  )
+  }
 
 
 ##This function plots a barchart for the most tweeted constituents

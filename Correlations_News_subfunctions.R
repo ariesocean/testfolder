@@ -28,10 +28,12 @@ correlation_news<-function(mydata,constituent){
   p<-p + labs(title = title_str)
   
   
-  p <- p + {if (C > 0.5) geom_line(aes(y = Close), linetype = "dashed", colour = "black")}
-  p <- p + {if (O > 0.5) geom_line(aes(y = Open), linetype = "dashed", colour = "red")}
-  p <- p + {if (H > 0.5) geom_line(aes(y = High), linetype = "dashed", colour = "blue")}
-  p <- p + {if (L > 0.5) geom_line(aes(y = Low), linetype = "dashed", colour = "orange")}
+  
+  p <- p + {if (C > 0.5) geom_line(aes(y = Close, colour = "Close"), linetype = "dashed")}
+  p <- p + {if (O > 0.5) geom_line(aes(y = Open, colour = "Open"), linetype = "dashed")}
+  p <- p + {if (H > 0.5) geom_line(aes(y = High, colour = "High"), linetype = "dashed")}
+  p <- p + {if (L > 0.5) geom_line(aes(y = Low, colour = 'Low'), linetype = "dashed")}
+  
   
   
   ##add annotations and scaling
@@ -203,7 +205,7 @@ correlation_news<-function(mydata,constituent){
   p_changed <- ggplotly(p)
   pp_changed=plotly_build(p_changed)   
   style( pp_changed ) %>% 
-    layout( legend = list(x = 0.01, y = 0.95) )
+    layout( legend = list(x = 0.999, y = 0.98))
 }
 
 
@@ -235,10 +237,10 @@ news_annotation_selection<-function(constituent){
     str = 'Only Highs have greater than 50% correlation to News sentiment for the total time period shown.'
   }
   if(constituent=='Daimler'){
-    str = 'Only Open has greater than 50% correlations to News sentiment for the time period shown'
+    str = 'Only Open has greater than 50% correlations to News sentiment for the time period shown.'
   }
   if(constituent=='Deutsche Börse'){
-    str = 'Only Close prices have greater than 50% correlations to News sentiment for the time period shown'
+    str = 'Only Close prices have greater than 50% correlations to News sentiment for the time period shown.'
   }
   if(constituent=='Deutsche Bank'){
     str = 'All stock prices have less than 50% correlation to News sentiment for the total time period shown.'
@@ -262,7 +264,7 @@ news_annotation_selection<-function(constituent){
     str = 'All stock prices have less than 50% correlation to News sentiment for the total time period shown.'
   }
   if(constituent=='Henkel'){
-    str = 'Open Close and Lows have greater than 50% correlations to News sentiment for Henkel'
+    str = 'Open Close and Lows have greater than 50% correlations to News sentiment for Henkel.'
   }
   if(constituent=='Infineon'){
     str = 'Only Open prices have greater than 50% correlation to News sentiment for the total time period shown.'
@@ -271,7 +273,7 @@ news_annotation_selection<-function(constituent){
     str = 'All stock prices have less than 50% correlation to News sentiment for the total time period shown.'
   }
   if(constituent=='Linde'){
-    str = 'Only Open Prices have greater than 50% correlations to News sentiment for the time period shown'
+    str = 'Only Open Prices have greater than 50% correlations to News sentiment for the time period shown.'
   }
   if(constituent=='Merck'){
     str = 'Only Open and Low prices have greater than 50% correlation to News sentiment for the total time period shown.'
@@ -280,7 +282,7 @@ news_annotation_selection<-function(constituent){
     str = 'All stock prices have less than 50% correlation to News sentiment for the total time period shown.'
   }
   if(constituent=='RWE'){
-    str = 'All stock prices have less than 50% correlation to News sentiment for the total time period shown'
+    str = 'All stock prices have less than 50% correlation to News sentiment for the total time period shown.'
   }
   if(constituent=='SAP'){
     str = 'Low, Close and High Prices have greater than 50% correlation to News sentiment for the total time period shown.'

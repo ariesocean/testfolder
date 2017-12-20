@@ -76,6 +76,7 @@ ui <- dashboardPage(
                   id='tabset1',
                   side='right',
                   height=550,
+                  selected = 'A-D',
                   #status = 'primary',
                   tabPanel('M-V',
                            plotOutput("analystplot3", height = 490, width = '100%')
@@ -94,6 +95,7 @@ ui <- dashboardPage(
                   height=550,
                   title = "Summary",
                   side='right',
+                  selected = 'A-D',
                   #status = 'primary',
                   tabPanel('M-V',
                            DT::dataTableOutput('summarytable3')),
@@ -289,7 +291,7 @@ ui <- dashboardPage(
                         tabPanel('Influencer',
                                  plotOutput("influencer_twitter_target_price", height=420))),
                 
-                 tabBox(title='Recent Tweets',side = 'right',
+                 tabBox(title='Recent Tweets',side = 'right',height=500,
                       tabPanel('Target Prices',
                         DT::dataTableOutput('recent_tweets_table'),
                         height=500)
