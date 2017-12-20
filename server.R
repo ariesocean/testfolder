@@ -61,6 +61,7 @@ server <- function(input, output){
    #from_date_temp <- as.integer(as.POSIXct(strptime(from_date,"%Y-%m-%d"))) * 1000
    #to_date_temp <- as.integer(as.POSIXct(strptime(to_date,"%Y-%m-%d"))) * 1000
 
+
   sql <- 'SELECT From_date, To_date, constituent,NEWS_TITLE_NewsDim,NEWS_DATE_NewsDim,NEWS_ARTICLE_TXT_NewsDim,categorised_tag,sentiment FROM[igenie-project:pecten_dataset_test.news_all];'
   news_all_data <- query_exec(project=project,  sql, billing = project)
   news_all_data$From_date<- strptime(news_all_data$From_date,format = "%Y-%m-%d")
@@ -73,6 +74,18 @@ server <- function(input, output){
      ##Sort by alphabetic order of constituents
     news_all_data <- news_all_data[order(news_all_data$constituent),]
      news_transform(news_all_data)
+
+  news_data_all <- eventReactive(input$reload, {
+     sql <- 'SELECT From_date, To_date, constituent,NEWS_TITLE_NewsDim,NEWS_DATE_NewsDim,NEWS_ARTICLE_TXT_NewsDim,categorised_tag,sentiment FROM[igenie-project:pecten_dataset_test.news_all];'
+     retrieved_data <- query_exec(project=project,  sql, billing = project)
+     retrieved_data$From_date<- strptime(retrieved_data$From_date,format = "%Y-%m-%d")
+     retrieved_data$To_date<-strptime(retrieved_data$To_date,format = "%Y-%m-%d")
+     retrieved_data <- retrieved_data[retrieved_data$From_date==as.Date(from_date) & retrieved_data$To_date==as.Date(to_date),]
+     retrieved_data <- retrieved_data[!is.na(retrieved_data$From_date),]
+     
+     ##Sort by alphabetic order of constituents
+     retrieved_data <- retrieved_data[order(retrieved_data$constituent),]
+     news_transform(retrieved_data,
    }, ignoreNULL = FALSE)
    output$news_all <- DT::renderDataTable(news_data_all(),selection = 'single', server=FALSE)
    
@@ -81,7 +94,11 @@ server <- function(input, output){
                   i = input$news_all_rows_selected
                   cat(i)
                   i <- i[length(i)]
+
                   retrieved_data <- news_all_data[order(news_all_data$constituent),]
+
+                  retrieved_data <- retrieved_data[order(retrieved_data$constituent),]
+
                   showModal(modalDialog(
                     
                     title = toString(retrieved_data[i,c('NEWS_TITLE_NewsDim')]),
@@ -89,6 +106,8 @@ server <- function(input, output){
                     toString(retrieved_data[i,c('NEWS_ARTICLE_TXT_NewsDim')])
                 ))
                })
+
+   
 
    
   
@@ -298,15 +317,17 @@ server <- function(input, output){
     if (nrows <2){
      df<-retrieved_data
     }
-    
+
     map_sentiment(df,constituent)
   })
   
   ##Frequency Mapping
+
   ##dummy
   
  
   
+
   output$popularity_map<-renderPlot({
      constituent = toString(input$constituent)
      sql <-paste('SELECT count,avg_sentiment,country_name,constituent,from_date,to_date FROM[igenie-project:pecten_dataset_test.country_data] WHERE constituent="',constituent,'";', sep='')
