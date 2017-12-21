@@ -323,13 +323,14 @@ server <- function(input, output){
      map_frequency(retrieved_data, constituent)
   })
   
-  
   ##Most Recent Tweets
   output$recent_tweets_table <- renderDataTable({
     constituent = toString(input$constituent)
     if (constituent =="Adidas"){constituent = 'adidas'}
     sql <- paste('SELECT * FROM[igenie-project:pecten_dataset_test.twitter_analytics_latest_price_tweets] WHERE constituent="',constituent,'";', sep='')
     retrieved_data <- query_exec(project=project,  sql, billing = project)
+    #删去重复text
+    retrieved_data <- retrieved_data[!duplicated(retrieved_data$text),]
     #retrieved_data<-na.omit(retrieved_data)
     #retrieved_data$tweet_date<- strptime(retrieved_data$tweet_date,format = "%Y-%m-%d %H:%M:%S")
     retrieved_data$to_date<-strptime(retrieved_data$to_date,format = "%Y-%m-%d")
