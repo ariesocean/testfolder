@@ -34,8 +34,8 @@ popular_tweet_treemap<-function(df){
   df$label <- paste(df$constituent,',', ' ' ,df$count ,sep = "")
   
   treemap(df,index="label",vSize="count",
-          vColor = "avg_sentiment_all",
-          #vColor = "count",
+          #vColor = "avg_sentiment_all",
+          vColor = "count",
           type='manual',
           #palette="RdYlGn", 
           palette = '#B865B4',
@@ -46,7 +46,8 @@ popular_tweet_treemap<-function(df){
           title="Most Tweeted Consistuent Count vs. Sentiment - Last 2 Months",
           fontsize.title = c(14),
           fontface.labels=c(0,0), #Trying to hide the legend. 
-          #bg.labels=c("transparent"), 
+          #bg.labels=c("transparent"),
+          fontsize.legend = 0, #hide legend
           border.col=c("white","white"), 
           border.lwds=c(7,2),
           align.labels=list(
