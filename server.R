@@ -201,7 +201,7 @@ server <- function(input, output){
      meth <- input$meth
      var_table <- value_at_risk(maxDate,tickers, weights, n, meth)
      
-     ggplot(var_table, aes(x=Type, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge") #+ scale_fill_manual(values = "Grey50", limits = 4)
+     ggplot(var_table, aes(x=Assets, y=VaR, fill=Assets)) + geom_bar(stat = "identity", position = "dodge") #+ scale_fill_manual(values = "Grey50", limits = 4)
    })
   # 
   
@@ -331,11 +331,16 @@ server <- function(input, output){
     retrieved_data <- query_exec(project=project,  sql, billing = project)
     #删去重复text
     retrieved_data <- retrieved_data[!duplicated(retrieved_data$text),]
-    #retrieved_data<-na.omit(retrieved_data)
-    #retrieved_data$tweet_date<- strptime(retrieved_data$tweet_date,format = "%Y-%m-%d %H:%M:%S")
+    #筛选日期
+    retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d" )
     retrieved_data$to_date<-strptime(retrieved_data$to_date,format = "%Y-%m-%d")
-    retrieved_data$from_date<-strptime(retrieved_data$from_date,format = "%Y-%m-%d")
-    #retrieved_data<-retrieved_data[retrieved_data$from_date ==as.Date(from_date) & retrieved_data$to_date==as.Date(to_date) ,]
+    retrieved_data<-retrieved_data[retrieved_data$from_date==as.Date(from_date)&retrieved_data$to_date==as.Date(to_date),]
+    #retrieved_data<-na.omit(retrieved_data)
+    nrows <- nrow(retrieved_data)
+    if (nrows == 0){
+      retrieved_data <- query_exec(project=project,  sql, billing = project)
+      retrieved_data <- retrieved_data[!duplicated(retrieved_data$text),]
+    }
     recent_tweets(retrieved_data)
   })
   

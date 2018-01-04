@@ -45,7 +45,8 @@ EPS_table<-function(retrieved_data){
       background = styleColorBar(df$`EPS_last_year`, '#62B5F6'),
       backgroundSize = '100% 90%',
       backgroundRepeat = 'no-repeat',
-      backgroundPosition = 'center')}
+      backgroundPosition = 'center')
+  }
 
 
 #Makes a horizontal bar datatable displaying PER
